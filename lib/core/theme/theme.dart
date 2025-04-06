@@ -6,17 +6,17 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: const ColorScheme.light(
-      // Warna Utama
-      primary: Color(0xFF00897B), // Hijau Toska
-      primaryContainer: Color(0xFFE0F2F1), // Primary Light
-      onPrimaryContainer: Color(0xFF006064), // Primary Dark
-      secondary: Color(0xFF388E3C), // Accent (Hijau)
-      // Warna Netral
+      // Main Colors
+      primary: Color(0xFF3366CC), // Main Blue
+      primaryContainer: Color(0xFFE6F0FF), // Primary Light
+      onPrimaryContainer: Color(0xFF0D47A1), // Primary Dark
+      secondary: Color(0xFF4285F4), // Secondary Blue
+      // Neutral Colors
       background: Color(0xFFF5F5F5), // Background
       surface: Color(0xFFFFFFFF), // Card Background
       onSurface: Color(0xFF212121), // Text Primary
       onBackground: Color(0xFF212121), // Text Primary
-      // Warna Fungsi
+      // Functional Colors
       error: Color(0xFFD32F2F), // Error
       errorContainer: Color(0xFFFFEBEE), // Error Light
       onError: Color(0xFFFFFFFF),
@@ -38,28 +38,28 @@ class AppTheme {
     cardTheme: CardTheme(
       color: const Color(0xFFFFFFFF),
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
 
     // AppBar
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF00897B),
+      backgroundColor: Color(0xFF3366CC),
       foregroundColor: Color(0xFFFFFFFF),
       elevation: 0,
     ),
 
     // FloatingActionButton
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF00897B),
+      backgroundColor: Color(0xFF3366CC),
       foregroundColor: Color(0xFFFFFFFF),
     ),
 
     // ElevatedButton
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF00897B),
+        backgroundColor: const Color(0xFF3366CC),
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     ),
   );
@@ -69,18 +69,18 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: const ColorScheme.dark(
-      // Warna Utama
-      primary: Color(0xFF4DB6AC), // Hijau Toska Terang
-      primaryContainer: Color(0xFF1D3C38), // Primary Light
-      onPrimaryContainer: Color(0xFF00796B), // Primary Dark
-      secondary: Color(0xFF66BB6A), // Accent (Hijau Terang)
-      // Warna Netral
+      // Main Colors
+      primary: Color(0xFF5B8DEF), // Light Blue
+      primaryContainer: Color(0xFF1A3366), // Primary Light
+      onPrimaryContainer: Color(0xFF5B8DEF), // Primary Dark
+      secondary: Color(0xFF4285F4), // Secondary Blue
+      // Neutral Colors
       background: Color(0xFF121212), // Background
       surface: Color(0xFF1E1E1E), // Card Background
       surfaceVariant: Color(0xFF282828), // Surface
       onSurface: Color(0xFFFFFFFF), // Text Primary
       onBackground: Color(0xFFFFFFFF), // Text Primary
-      // Warna Fungsi
+      // Functional Colors
       error: Color(0xFFEF5350), // Error
       errorContainer: Color(0xFFC62828), // Error Dark
       onError: Color(0xFFFFFFFF),
@@ -102,38 +102,38 @@ class AppTheme {
     cardTheme: CardTheme(
       color: const Color(0xFF1E1E1E),
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
 
     // AppBar
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF00796B),
+      backgroundColor: Color(0xFF1A3366),
       foregroundColor: Color(0xFFFFFFFF),
       elevation: 0,
     ),
 
     // FloatingActionButton
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF4DB6AC),
+      backgroundColor: Color(0xFF5B8DEF),
       foregroundColor: Color(0xFFFFFFFF),
     ),
 
     // ElevatedButton
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF00796B),
+        backgroundColor: Color(0xFF3366CC),
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     ),
   );
 
-  // Custom colors yang tidak masuk ke dalam ThemeData
-  static const successColor = Color(0xFF388E3C); // Success
+  // Custom colors not included in ThemeData
+  static const successColor = Color(0xFF4CAF50); // Success
   static const successLightColor = Color(0xFFE8F5E9); // Success Light
   static const warningColor = Color(0xFFFFA000); // Warning
   static const warningLightColor = Color(0xFFFFF3E0); // Warning Light
-  static const infoColor = Color(0xFF1976D2); // Info
+  static const infoColor = Color(0xFF2196F3); // Info (Blue)
   static const infoLightColor = Color(0xFFE3F2FD); // Info Light
 
   // Dark theme custom colors
@@ -146,25 +146,25 @@ class AppTheme {
 
   // Gradients
   static const LinearGradient lightHeaderGradient = LinearGradient(
-    colors: [Color(0xFF006064), Color(0xFF00897B)],
+    colors: [Color(0xFF0D47A1), Color(0xFF3366CC)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
 
   static const LinearGradient lightButtonGradient = LinearGradient(
-    colors: [Color(0xFF00897B), Color(0xFF4DB6AC)],
+    colors: [Color(0xFF3366CC), Color(0xFF5B8DEF)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
 
   static const LinearGradient darkHeaderGradient = LinearGradient(
-    colors: [Color(0xFF004D40), Color(0xFF00695C)],
+    colors: [Color(0xFF0D2B66), Color(0xFF1A3366)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
 
   static const LinearGradient darkButtonGradient = LinearGradient(
-    colors: [Color(0xFF00796B), Color(0xFF26A69A)],
+    colors: [Color(0xFF3366CC), Color(0xFF5B8DEF)],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
