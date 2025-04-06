@@ -6,7 +6,7 @@ import 'features/activity_page.dart';
 import 'features/home/presentation/home_page.dart';
 import 'features/quran/quran_page.dart';
 import 'features/financial/finance_report_page.dart';
-import 'features/profile_page.dart';
+import 'features/account/presentation/profile_page.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({super.key});

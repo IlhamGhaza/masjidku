@@ -1,15 +1,17 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
 import 'dart:ui';
 
-import '../../../core/components/buttons.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../event/announcement_page.dart';
 import '../../event/upcoming_event_page.dart';
 import '../../prayer/prayer_page.dart';
-import '../../profile_page.dart';
+import '../../account/presentation/profile_page.dart';
 import '../widget/icon_home_widget.dart';
 import 'notification_page.dart';
 
@@ -45,6 +47,22 @@ class _HomePageState extends State<HomePage> {
     {'name': 'Asr', 'time': '4:45 PM', 'status': ''},
     {'name': 'Maghrib', 'time': '7:20 PM', 'status': ''},
     {'name': 'Isha', 'time': '8:45 PM', 'status': ''},
+  ];
+
+  //annoucement (icon, title, desc, date)
+  final List<Map<String, dynamic>> _announcements = [
+    {
+      'icon': Icons.announcement,
+      'title': 'Announcement 1',
+      'desc': 'This is the first announcement.',
+      'date': '2023-01-01',
+    },
+    {
+      'icon': Icons.announcement,
+      'title': 'Announcement 2',
+      'desc': 'This is the second announcement.',
+      'date': '2023-01-02',
+    },
   ];
 
   final List<Color> _iconColors = [
@@ -175,214 +193,93 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          _buildDateCard("01/01/2023", "01/01/1444"),
+                          _buildDateCard(
+                            "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                            Hijriyah.fromDate(
+                              DateTime.now().toLocal(),
+                            ).toFormat("dd MMMM yyyy"),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  _seeAll(colorScheme, context, 'Today Prayer', () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => PrayerPage()),
-                    );
-                  }),
-
-                  // prayer time,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      for (var prayer in prayerTimes)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              // Reset all statuses
-                              for (var p in prayerTimes) {
-                                p['status'] = '';
-                              }
-                              // Set status for the tapped prayer
-                              prayer['status'] = 'Started';
-                            });
-                          },
-                          child: Container(
-                            width: 70,
-                            height: 120,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: colorScheme.surface,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  prayer['name'],
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: colorScheme.onSurface.withValues(
-                                      alpha: 0.7,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  prayer['time'],
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                ),
-                                if (prayer['status'].isNotEmpty)
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 4),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.successColor.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Text(
-                                      prayer['status'],
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: AppTheme.successColor,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  // next prayer
+                  //card prayer
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Container(
-                      height: 55,
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: EdgeInsets.all(20.0),
+                      height: 200,
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: colorScheme.secondary.withValues(alpha: 0.15),
-                      ),
-                      child: Row(
-                        spacing: 5,
-                        children: [
-                          Container(
-                            height: 30,
-                            width: 30,
-                            decoration: BoxDecoration(
-                              color: colorScheme.secondary.withValues(
-                                alpha: 0.2,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.access_time_filled,
-                              color: colorScheme.primary,
-                            ),
+                        color: colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16.0),
+                        image: DecorationImage(
+                          image: AssetImage(
+                            DateTime.now().hour >= 6 && DateTime.now().hour < 17
+                                ? 'assets/images/duhur.png'
+                                : 'assets/images/banner.png',
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 6.0,
-                              horizontal: 8.0,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Next Prayer : ',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Fajr ',
-                                      style: TextStyle(
-                                        color: colorScheme.primary,
-                                      ),
-                                    ),
-                                    Text(
-                                      'in - ',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                      ),
-                                    ),
-                                    Text(
-                                      '20 min',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                      ),
-                                    ),
-                                  ],
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Bogor, Jawa Barat',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
-                                Row(
-                                  spacing: 3,
-                                  children: [
-                                    Text(
-                                      '1:30 AM',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                )
-                                                : Colors.black.withValues(
-                                                  alpha: 0.5,
-                                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Maghrib',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              // const SizedBox(height: 10),
+                              Text(
+                                "18:00",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '-2:00',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => const PrayerPage(),
                                       ),
-                                    ),
-                                    Text(
-                                      '| iqomah :',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                )
-                                                : Colors.black.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                      ),
-                                    ),
-                                    Text(
-                                      '10:30 PM',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white.withValues(
-                                                  alpha: 0.5,
-                                                )
-                                                : Colors.black.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                      ),
-                                    ),
-                                  ],
+                                    );
+                                  },
+                                  child: Text(context.tr('see_all'),),
                                 ),
                               ],
                             ),
@@ -391,52 +288,233 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
+
+                  // _seeAll(colorScheme, context, 'Today Prayer', () {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context) => PrayerPage()),
+                  //   );
+                  // }),
+                  // // prayer time,
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //   children: [
+                  //     for (var prayer in prayerTimes)
+                  //       GestureDetector(
+                  //         onTap: () {
+                  //           setState(() {
+                  //             // Reset all statuses
+                  //             for (var p in prayerTimes) {
+                  //               p['status'] = '';
+                  //             }
+                  //             // Set status for the tapped prayer
+                  //             prayer['status'] = 'Started';
+                  //           });
+                  //         },
+                  //         child: Container(
+                  //           width: 70,
+                  //           height: 120,
+                  //           padding: const EdgeInsets.symmetric(
+                  //             vertical: 8,
+                  //             horizontal: 4,
+                  //           ),
+                  //           decoration: BoxDecoration(
+                  //             color: colorScheme.surface,
+                  //             borderRadius: BorderRadius.circular(10),
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 color: Colors.black.withValues(alpha: 0.05),
+                  //                 blurRadius: 5,
+                  //                 spreadRadius: 1,
+                  //               ),
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.center,
+                  //             children: [
+                  //               Text(
+                  //                 prayer['name'],
+                  //                 style: TextStyle(
+                  //                   fontSize: 12,
+                  //                   color: colorScheme.onSurface.withValues(
+                  //                     alpha: 0.7,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //               const SizedBox(height: 4),
+                  //               Text(
+                  //                 prayer['time'],
+                  //                 style: TextStyle(
+                  //                   fontSize: 14,
+                  //                   fontWeight: FontWeight.bold,
+                  //                   color: colorScheme.onSurface,
+                  //                 ),
+                  //               ),
+                  //               if (prayer['status'].isNotEmpty)
+                  //                 Container(
+                  //                   margin: const EdgeInsets.only(top: 4),
+                  //                   padding: const EdgeInsets.symmetric(
+                  //                     horizontal: 6,
+                  //                     vertical: 2,
+                  //                   ),
+                  //                   decoration: BoxDecoration(
+                  //                     color: AppTheme.successColor.withValues(
+                  //                       alpha: 0.2,
+                  //                     ),
+                  //                     borderRadius: BorderRadius.circular(10),
+                  //                   ),
+                  //                   child: Text(
+                  //                     prayer['status'],
+                  //                     style: TextStyle(
+                  //                       fontSize: 10,
+                  //                       color: AppTheme.successColor,
+                  //                     ),
+                  //                   ),
+                  //                 ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //   ],
+                  // ),
+                  // // next prayer
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  //   child: Container(
+                  //     height: 55,
+                  //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  //     decoration: BoxDecoration(
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       color: colorScheme.secondary.withValues(alpha: 0.15),
+                  //     ),
+                  //     child: Row(
+                  //       spacing: 5,
+                  //       children: [
+                  //         Container(
+                  //           height: 30,
+                  //           width: 30,
+                  //           decoration: BoxDecoration(
+                  //             color: colorScheme.secondary.withValues(
+                  //               alpha: 0.2,
+                  //             ),
+                  //           ),
+                  //           child: Icon(
+                  //             Icons.access_time_filled,
+                  //             color: colorScheme.primary,
+                  //           ),
+                  //         ),
+                  //         Padding(
+                  //           padding: const EdgeInsets.symmetric(
+                  //             vertical: 6.0,
+                  //             horizontal: 8.0,
+                  //           ),
+                  //           child: Column(
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Row(
+                  //                 children: [
+                  //                   Text(
+                  //                     'Next Prayer : ',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white
+                  //                               : Colors.black,
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     'Fajr ',
+                  //                     style: TextStyle(
+                  //                       color: colorScheme.primary,
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     'in - ',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white
+                  //                               : Colors.black,
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     '20 min',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white
+                  //                               : Colors.black,
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //               Row(
+                  //                 spacing: 3,
+                  //                 children: [
+                  //                   Text(
+                  //                     '1:30 AM',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white.withValues(
+                  //                                 alpha: 0.5,
+                  //                               )
+                  //                               : Colors.black.withValues(
+                  //                                 alpha: 0.5,
+                  //                               ),
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     '| iqomah :',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white.withValues(
+                  //                                 alpha: 0.5,
+                  //                               )
+                  //                               : Colors.black.withValues(
+                  //                                 alpha: 0.5,
+                  //                               ),
+                  //                     ),
+                  //                   ),
+                  //                   Text(
+                  //                     '10:30 PM',
+                  //                     style: TextStyle(
+                  //                       color:
+                  //                           isDarkMode
+                  //                               ? Colors.white.withValues(
+                  //                                 alpha: 0.5,
+                  //                               )
+                  //                               : Colors.black.withValues(
+                  //                                 alpha: 0.5,
+                  //                               ),
+                  //                     ),
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   //icon
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        spacing: 40,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IconHomeWidget(
-                            iconName: Icons.wb_sunny,
-                            iconDescription: 'Sunrise',
-                            onTap: () {},
-                          ),
-                          IconHomeWidget(
-                            iconName: Icons.wb_sunny,
-                            iconDescription: 'Sunrise',
-                            onTap: () {},
-                          ),
-                          IconHomeWidget(
-                            iconName: Icons.wb_sunny,
-                            iconDescription: 'Sunrise',
-                            onTap: () {},
-                          ),
-                          IconHomeWidget(
-                            iconName: Icons.wb_sunny,
-                            iconDescription: 'Sunrise',
-                            onTap: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  //
-                  _seeAll(colorScheme, context, 'Upcoming Events', () {
+                  _gridIcon(),
+                  //announcement
+                  _seeAll(colorScheme, context, 'announcement'.tr(), () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => UpcomingEventPage()),
+                      MaterialPageRoute(
+                        builder: (context) => AnnouncementPage(),
+                      ),
                     );
                   }),
-                  //event section
+                  //announcement section
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-
                     child: SizedBox(
-                      height: 138,
+                      height: 173,
                       child: ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
@@ -446,86 +524,79 @@ class _HomePageState extends State<HomePage> {
                               _iconColors[index % _iconColors.length];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              spacing: 10,
-                              children: [
-                                Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                    color: itemColor.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              width: double.infinity,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: isDarkMode ? Colors.black : Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 3,
+                                    spreadRadius: 0,
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        _events[index]['date'],
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: itemColor,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      Text(
-                                        _events[index]['month'].substring(0, 3),
-                                        style: TextStyle(
-                                          color: itemColor,
-                                          fontSize: 12,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    offset: Offset(0, 3),
+                                    blurRadius: 8,
+                                    spreadRadius: 0,
                                   ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  spacing: 10,
                                   children: [
-                                    Text(
-                                      _events[index]['name'],
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black.withValues(
-                                                  alpha: 0.7,
-                                                ),
-                                      ),
-                                    ),
-                                    Text(
-                                      _events[index]['desc'],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.access_time,
-                                          size: 12,
-                                          color:
-                                              isDarkMode
-                                                  ? Colors.white
-                                                  : Colors.black.withValues(
-                                                    alpha: 0.5,
-                                                  ),
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color: itemColor.withValues(
+                                          alpha: 0.15,
                                         ),
-                                        SizedBox(width: 4),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Icon(
+                                        _announcements[index]['icon'],
+                                        color: itemColor,
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
                                         Text(
-                                          _events[index]['time'],
+                                          _announcements[index]['title'],
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            color:
+                                                isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black.withValues(
+                                                      alpha: 0.7,
+                                                    ),
+                                          ),
+                                        ),
+                                        Text(
+                                          _announcements[index]['desc'],
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color:
+                                                isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black.withValues(
+                                                      alpha: 0.5,
+                                                    ),
+                                          ),
+                                        ),
+                                        Text(
+                                          _announcements[index]['date'],
                                           style: TextStyle(
                                             fontSize: 12,
                                             color:
@@ -540,7 +611,164 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                              ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  //event
+                  _seeAll(colorScheme, context, 'Upcoming Events'.tr(), () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UpcomingEventPage(),
+                      ),
+                    );
+                  }),
+                  //event section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: SizedBox(
+                      height: 173,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 2,
+                        itemBuilder: (context, index) {
+                          final itemColor =
+                              _iconColors[index % _iconColors.length];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Container(
+                              width: double.infinity,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: isDarkMode ? Colors.black : Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.05),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 3,
+                                    spreadRadius: 0,
+                                  ),
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    offset: Offset(0, 3),
+                                    blurRadius: 8,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  spacing: 10,
+                                  children: [
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color: itemColor.withValues(
+                                          alpha: 0.15,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            _events[index]['date'],
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: itemColor,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          Text(
+                                            _events[index]['month'].substring(
+                                              0,
+                                              3,
+                                            ),
+                                            style: TextStyle(
+                                              color: itemColor,
+                                              fontSize: 12,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _events[index]['name'],
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            color:
+                                                isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black.withValues(
+                                                      alpha: 0.7,
+                                                    ),
+                                          ),
+                                        ),
+                                        Text(
+                                          _events[index]['desc'],
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color:
+                                                isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black.withValues(
+                                                      alpha: 0.5,
+                                                    ),
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.access_time,
+                                              size: 12,
+                                              color:
+                                                  isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black.withValues(
+                                                        alpha: 0.5,
+                                                      ),
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              _events[index]['time'],
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color:
+                                                    isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black
+                                                            .withValues(
+                                                              alpha: 0.5,
+                                                            ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
                         },
@@ -557,7 +785,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Current Campaigns',
+                          context.tr('current_campaign'),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -624,7 +852,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           child: Text(
-                            'Donate Now',
+                            context.tr('donate_now'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -645,6 +873,110 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _gridIcon() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWideScreen =
+              constraints.maxWidth > 600; // Threshold for wide screen
+
+          if (isWideScreen) {
+            // Single row for wider screens
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: 40,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  IconHomeWidget(
+                    iconName: Icons.menu_book,
+                    iconDescription: 'quran'.tr(),
+                    onTap: () {},
+                  ),
+                  IconHomeWidget(
+                    iconName: Icons.calendar_month,
+                    iconDescription: 'calendar'.tr(),
+                    onTap: () {},
+                  ),
+                  IconHomeWidget(
+                    iconName: Icons.volunteer_activism,
+                    iconDescription: 'donate'.tr(),
+                    onTap: () {},
+                  ),
+                  IconHomeWidget(
+                    iconName: Icons.explore,
+                    iconDescription: 'community'.tr(),
+                    onTap: () {},
+                  ),
+                  IconHomeWidget(
+                    iconName: Icons.mic,
+                    iconDescription: 'lectures'.tr(),
+                    onTap: () {},
+                  ),
+                  IconHomeWidget(
+                    iconName: Icons.more_horiz,
+                    iconDescription: 'more'.tr(),
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            );
+          } else {
+            // Two rows for phone screens
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconHomeWidget(
+                      iconName: Icons.menu_book,
+                      iconDescription: 'quran'.tr(),
+                      onTap: () {},
+                    ),
+
+                    IconHomeWidget(
+                      iconName: Icons.calendar_month,
+                      iconDescription: 'calender'.tr(),
+                      onTap: () {},
+                    ),
+                    IconHomeWidget(
+                      iconName: Icons.volunteer_activism,
+                      iconDescription: 'donate'.tr(),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconHomeWidget(
+                      iconName: Icons.volunteer_activism,
+                      iconDescription: 'donate'.tr(),
+                      onTap: () {},
+                    ),
+                    IconHomeWidget(
+                      iconName: Icons.mic,
+                      iconDescription: 'lecture'.tr(),
+                      onTap: () {},
+                    ),
+                    IconHomeWidget(
+                      iconName: Icons.more_horiz,
+                      iconDescription: 'more'.tr(),
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  //
   Widget _seeAll(
     ColorScheme colorScheme,
     BuildContext contex,
@@ -668,7 +1000,7 @@ class _HomePageState extends State<HomePage> {
           InkWell(
             onTap: onTap,
             child: Text(
-              "See all",
+              context.tr("see_all"),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -734,7 +1066,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Today',
+                    context.tr('today'),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 14,
@@ -755,7 +1087,7 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Hijri',
+                    context.tr('hijri'),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
                       fontSize: 14,

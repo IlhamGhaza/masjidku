@@ -64,7 +64,13 @@ class _SplashPageState extends State<SplashPage>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.mosque, size: 100, color: Colors.white),
+                      // Icon(Icons.mosque, size: 100, color: Colors.white),
+                      Image.asset(
+                        'assets/icons/mosque.png',
+                        width: 150,
+                        height: 150,
+                        color: Colors.white,
+                      ),
                       const SizedBox(height: 20),
                       const Text(
                         'Masjidku',

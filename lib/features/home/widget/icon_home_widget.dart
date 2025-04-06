@@ -6,6 +6,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
 
+class _UsedIndices {
+  static final _UsedIndices instance = _UsedIndices._();
+  final Set<int> _indices = {};
+
+  _UsedIndices._();
+
+  bool contains(int index) => _indices.contains(index);
+  void add(int index) => _indices.add(index);
+  void clear() => _indices.clear();
+  int get length => _indices.length;
+}
+
 class IconHomeWidget extends StatefulWidget {
   final IconData iconName;
   final String iconDescription;
@@ -36,11 +48,25 @@ class _IconHomeWidgetState extends State<IconHomeWidget> {
   late final Color _selectedColor;
 
   @override
+   int _selectedIndex = 0;
+
+  @override
   void initState() {
     super.initState();
-    // Pilih warna secara acak saat widget diinisialisasi
-    final random = Random();
-    _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
+
+    final usedIndices = _UsedIndices.instance;
+
+    do {
+      _selectedIndex = Random().nextInt(_iconColors.length);
+    } while (usedIndices.contains(_selectedIndex));
+
+    usedIndices.add(_selectedIndex);
+
+    if (usedIndices.length == _iconColors.length) {
+      usedIndices.clear();
+    }
+
+    _selectedColor = _iconColors[_selectedIndex];
   }
 
   @override
@@ -48,9 +74,7 @@ class _IconHomeWidgetState extends State<IconHomeWidget> {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
         final isDarkMode = themeMode == ThemeMode.dark;
-        // final theme = isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme;
-        // final colorScheme = theme.colorScheme;
-        // final screenSize = MediaQuery.of(context).size;
+
         return Column(
           children: [
             Container(
@@ -59,7 +83,6 @@ class _IconHomeWidgetState extends State<IconHomeWidget> {
               decoration: BoxDecoration(
                 color: _selectedColor,
                 borderRadius: BorderRadius.circular(10),
-                // border: Border.all(color: Colors.black, width: 1.5),
               ),
               child: IconButton(
                 onPressed: widget.onTap,

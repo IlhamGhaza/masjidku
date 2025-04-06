@@ -30,25 +30,25 @@ environment:
 dependencies:
   adhan: ^2.0.0+1
   alarm: ^5.0.3
-  connectivity_plus: ^6.1.3
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
-  file_picker: ^9.2.1
+  easy_localization: ^3.0.7+1
+  file_picker: ^10.0.0
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.0
-  flutter_facebook_auth: ^7.1.1
   flutter_local_notifications: ^19.0.0
   flutter_svg: ^2.0.17
   geocoding: ^3.0.0
   geolocator: ^13.0.2
   google_fonts: ^6.2.1
   hijriyah_indonesia: ^0.1.5
+  home_widget: ^0.7.0+1
   http: ^1.3.0
   hydrated_bloc: ^10.0.0
   image_picker: ^1.1.2
   internet_connection_checker_plus: ^2.7.1
-  intl: ^0.20.2
+  intl: ^0.19.0
   location: ^8.0.0
   path_provider: ^2.1.5
   permission_handler: ^11.4.0
@@ -85,6 +85,7 @@ flutter:
     - assets/fonts/
     - assets/icons/
     - assets/audios/
+    - assets/translations/
   fonts:
     - family: Uthmanic
       fonts:
@@ -95,6 +96,12 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/logo/1024.png"
   remove_alpha_ios: true
+  web:
+    generate: true
+  Windows:
+    generate: true
+  macOS:
+    generate: true
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
