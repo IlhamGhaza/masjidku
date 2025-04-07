@@ -1,7 +1,13 @@
 {
+    "home": "Home",
+    "quran": "Quran",
+    "activity": "Activity",
+    "finance": "Finance",
     "profile": "Profile",
     "logout": "Logout",
     "edit_profile": "Edit Profile",
+    "prayer": "Prayer",
+    "prayer_times": "Prayer Times",
     "appearance": "Appearance",
     "language": "Language",
     "account_settings": "Account Settings",
@@ -24,9 +30,9 @@
     "donate": "Donate",
     "donate_now": "Donate Now",
     "calender": "Calender",
-    "quran": "Quran",
     "community": "Community",
     "lecture": "Lecture",
     "more": "More",
-    "announcement": "Announcement"
+    "announcement": "Announcement",
+    "latest_activity": "Latest Activity"
 }

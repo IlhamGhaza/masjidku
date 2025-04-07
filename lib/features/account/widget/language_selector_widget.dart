@@ -27,9 +27,10 @@ class LanguageSelectorWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 10.0,
-              horizontal: 50.0,
+              horizontal: 40.0,
             ),
             child: Column(
+              spacing: 5,
               children: [
                 _buildLanguageOption(
                   context,

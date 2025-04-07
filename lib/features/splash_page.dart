@@ -17,6 +17,12 @@ class _SplashPageState extends State<SplashPage>
   late Animation<double> _scaleAnimation;
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -40,12 +46,6 @@ class _SplashPageState extends State<SplashPage>
         MaterialPageRoute(builder: (context) => const NavBar()),
       );
     });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override

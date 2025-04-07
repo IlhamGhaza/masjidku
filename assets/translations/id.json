@@ -1,7 +1,13 @@
 {
+    "home": "Beranda",
+    "quran": "Al-Quran",
+    "activity": "Aktivitas",
+    "finance": "Keuangan",
     "profile": "Profil",
     "logout": "Keluar",
     "edit_profile": "Edit Profil",
+    "prayer": "Sholat",
+    "prayer_times": "Waktu Sholat",
     "appearance": "Tampilan",
     "language": "Bahasa",
     "account_settings": "Pengaturan Akun",
@@ -24,9 +30,9 @@
     "donate": "Donasi",
     "donate_now": "Donasi Sekarang",
     "calender": "Kalender",
-    "uran": "Al-Quran",
     "community": "Komunitas",
     "lecture": "Pembicaraan",
     "more": "Lainnya",
-    "announcement": "Pengumuman"
+    "announcement": "Pengumuman",
+    "latest_activity": "Aktivitas Terbaru"
 }

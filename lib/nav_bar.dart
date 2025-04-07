@@ -7,6 +7,7 @@ import 'features/home/presentation/home_page.dart';
 import 'features/quran/quran_page.dart';
 import 'features/financial/finance_report_page.dart';
 import 'features/account/presentation/profile_page.dart';
+import 'package:easy_localization/easy_localization.dart'; // Sesuaikan dengan package lokalisasi yang Anda gunakan
 
 class NavBar extends StatefulWidget {
   const NavBar({super.key});
@@ -15,7 +16,7 @@ class NavBar extends StatefulWidget {
   State<NavBar> createState() => _NavBarState();
 }
 
-class _NavBarState extends State<NavBar> {
+class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
@@ -33,7 +34,40 @@ class _NavBarState extends State<NavBar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    // Dipanggil ketika locale berubah
+    if (mounted) {
+      setState(() {
+        // Force rebuild
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Force rebuild
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final currentLocale = context.locale; // for easy_localization
+
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
         final isDarkMode = themeMode == ThemeMode.dark;
@@ -80,31 +114,31 @@ class _NavBarState extends State<NavBar> {
                           NavigationRailDestination(
                             icon: const Icon(Icons.home_outlined),
                             selectedIcon: const Icon(Icons.home_rounded),
-                            label: Text('Beranda'),
+                            label: Text('home'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.menu_book_outlined),
                             selectedIcon: const Icon(Icons.menu_book_rounded),
-                            label: Text('Quran'),
+                            label: Text('quran'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.account_balance_outlined),
                             selectedIcon: const Icon(
                               Icons.account_balance_rounded,
                             ),
-                            label: Text('Keuangan'),
+                            label: Text('finance'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.calendar_today_outlined),
                             selectedIcon: const Icon(
                               Icons.calendar_today_rounded,
                             ),
-                            label: Text('Kegiatan'),
+                            label: Text('activity'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.person_outline_rounded),
                             selectedIcon: const Icon(Icons.person_rounded),
-                            label: Text('Profil'),
+                            label: Text('profile'.tr()),
                           ),
                         ],
                       ),
@@ -154,6 +188,7 @@ class _NavBarState extends State<NavBar> {
                     ],
                   ),
                   child: NavigationBar(
+                    key: ValueKey('navbar_${currentLocale.languageCode}'),
                     height: 65,
                     elevation: 0,
                     selectedIndex: _selectedIndex,
@@ -176,7 +211,7 @@ class _NavBarState extends State<NavBar> {
                           Icons.home_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'Beranda',
+                        label: 'home'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -190,7 +225,7 @@ class _NavBarState extends State<NavBar> {
                           Icons.menu_book_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'Quran',
+                        label: 'quran'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -204,7 +239,7 @@ class _NavBarState extends State<NavBar> {
                           Icons.account_balance_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'Keuangan',
+                        label: 'finance'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -218,7 +253,7 @@ class _NavBarState extends State<NavBar> {
                           Icons.calendar_today_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'Kegiatan',
+                        label: 'activity'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -232,7 +267,7 @@ class _NavBarState extends State<NavBar> {
                           Icons.person_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'Profil',
+                        label: 'profile'.tr(),
                       ),
                     ],
                   ),
