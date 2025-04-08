@@ -21,7 +21,24 @@ class _QuranPageState extends State<QuranPage> {
 
         final colorScheme = theme.colorScheme;
         final screenSize = MediaQuery.of(context).size;
-        return Scaffold();
+        return Scaffold(
+          backgroundColor: colorScheme.background,
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Text(
+                  'Quran Page',
+                  style: TextStyle(
+                    color: colorScheme.onBackground,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }

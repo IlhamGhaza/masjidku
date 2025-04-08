@@ -11,7 +11,7 @@ class _UpcomingEventPageState extends State<UpcomingEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Upcoming Events')),
+      appBar: AppBar(title: const Text('Upcoming Events'),),
       body: const Center(child: Text('Upcoming Events')),
     );
   }

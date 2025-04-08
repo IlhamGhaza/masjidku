@@ -22,7 +22,6 @@ class _ProfilePageState extends State<ProfilePage> {
         final theme = isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme;
 
         final colorScheme = theme.colorScheme;
-        final screenSize = MediaQuery.of(context).size;
         return Scaffold(
           backgroundColor: colorScheme.background,
           appBar: AppBar(
@@ -36,11 +35,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Container(
                     width: double.infinity,
-                    height: 200,
                     decoration: BoxDecoration(
                       color: colorScheme.surface,
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -68,166 +67,36 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 15,
                       children: [
                         _textSettings(isDarkMode, 'appearance'.tr()),
+                        const SizedBox(height: 10),
                         _switchTheme(isDarkMode, context),
+                        const SizedBox(height: 15),
                         _textSettings(isDarkMode, 'language'.tr()),
+                        const SizedBox(height: 10),
                         Container(
                           width: double.infinity,
-                          height: 130,
                           decoration: BoxDecoration(
                             color: colorScheme.surface,
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: LanguageSelectorWidget(
-                              isDarkMode: isDarkMode,
-                              colorScheme: colorScheme,
-                            ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: LanguageSelectorWidget(
+                            isDarkMode: isDarkMode,
+                            colorScheme: colorScheme,
                           ),
                         ),
-                        // _textSettings(isDarkMode, 'account_settings'.tr()),
+                        const SizedBox(height: 15),
                         _textSettings(isDarkMode, 'latest_activity'.tr()),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Color(0xff2E8B57),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Icon(Icons.settings, color: Colors.white),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Donasi untuk Pembangunan',
-                                  style: TextStyle(
-                                    color:
-                                        isDarkMode
-                                            ? Colors.white
-                                            : Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    Text(
-                                      '5 April 2025 ',
-                                      style: TextStyle(
-                                        color:
-                                            isDarkMode
-                                                ? Colors.white
-                                                : Colors.black,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(left: 10),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xff2E8B57),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Text(
-                                        'Berhasil',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        //container logout
-                        InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Konfirmasi'),
-                                  content: Text(
-                                    'Apakah Anda yakin ingin keluar?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Tidak'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // logout
-                                        // context.read<AuthBloc>().add(
-                                        //   AuthLogoutRequested(),
-                                        // );
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => const LoginPage(),
-                                          ),
-                                        );
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.green,
-                                            content: Text(
-                                              'Anda berhasil logout',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text('Ya'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Center(
-                              child: Text(
-                                context.tr('logout'),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        const SizedBox(height: 10),
+                        _buildLatestActivity(isDarkMode),
+                        const SizedBox(height: 20),
+                        _buildLogoutButton(context, colorScheme),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -252,87 +121,203 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  //
   Widget _switchTheme(bool isDarkMode, BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 95,
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.white : Colors.black,
         borderRadius: BorderRadius.circular(15),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: Column(
-                spacing: 10,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isDarkMode
-                        ? context.tr('light_mode')
-                        : context.tr('dark_mode'),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.black : Colors.white,
-                    ),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isDarkMode
+                      ? context.tr('light_mode')
+                      : context.tr('dark_mode'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
-                  Text(
-                    isDarkMode
-                        ? context.tr('light_mode_description')
-                        : context.tr('dark_mode_description'),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDarkMode ? Colors.black : Colors.white,
-                    ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  isDarkMode
+                      ? context.tr('light_mode_description')
+                      : context.tr('dark_mode_description'),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDarkMode ? Colors.black : Colors.white,
                   ),
-                ],
-              ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
+              ],
             ),
-            Switch(
-              value: isDarkMode,
-              onChanged: (value) {
-                context.read<ThemeCubit>().updateTheme(
-                  value ? ThemeMode.dark : ThemeMode.light,
-                );
-              },
-            ),
-            // SizedBox(
-            //   width: 80,
-            //   height: 40,
-            //   child: Stack(
-            //     alignment: Alignment.center,
-            //     children: [
-            //       Switch(
-            //         value: isDarkMode,
-            //         onChanged: (value) {
-            //           context.read<ThemeCubit>().updateTheme(
-            //             value ? ThemeMode.dark : ThemeMode.light,
-            //           );
-            //         },
-            //       ),
-            //       Positioned(
-            //         left: 15,
-            //         child: Icon(Icons.light_mode, color: Colors.amber, size: 10),
-            //       ),
-            //       Positioned(
-            //         right: 15,
-            //         child: Icon(Icons.dark_mode, color: Colors.indigo, size: 10),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-          ],
-        ),
+          ),
+          Switch(
+            value: isDarkMode,
+            onChanged: (value) {
+              context.read<ThemeCubit>().updateTheme(
+                value ? ThemeMode.dark : ThemeMode.light,
+              );
+            },
+          ),
+
+          // SizedBox(
+          //   width: 80,
+          //   height: 40,
+          //   child: Stack(
+          //     alignment: Alignment.center,
+          //     children: [
+          //       Switch(
+          //         value: isDarkMode,
+          //         onChanged: (value) {
+          //           context.read<ThemeCubit>().updateTheme(
+          //             value ? ThemeMode.dark : ThemeMode.light,
+          //           );
+          //         },
+          //       ),
+          //       Positioned(
+          //         left: 15,
+          //         child: Icon(Icons.light_mode, color: Colors.amber, size: 10),
+          //       ),
+          //       Positioned(
+          //         right: 15,
+          //         child: Icon(Icons.dark_mode, color: Colors.indigo, size: 10),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        ],
       ),
     );
   }
 
-  //
+  Widget _buildLatestActivity(bool isDarkMode) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: const Color(0xff2E8B57),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: const Icon(Icons.settings, color: Colors.white),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Donasi untuk Pembangunan',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 5),
+              Wrap(
+                spacing: 10,
+                children: [
+                  Text(
+                    '5 April 2025',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff2E8B57),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Berhasil',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context, ColorScheme colorScheme) {
+    return InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Konfirmasi'),
+              content: const Text('Apakah Anda yakin ingin keluar?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Tidak'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: Colors.green,
+                        content: Text('Anda berhasil logout'),
+                      ),
+                    );
+                  },
+                  child: const Text('Ya'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        height: 50,
+        decoration: BoxDecoration(
+          color: colorScheme.primary,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Center(
+          child: Text(
+            context.tr('logout'),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -27,10 +27,10 @@ class LanguageSelectorWidget extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 10.0,
-              horizontal: 40.0,
+              horizontal: 20.0, // Mengurangi padding horizontal
             ),
             child: Column(
-              spacing: 5,
+              mainAxisSize: MainAxisSize.min, // Menggunakan mainAxisSize.min
               children: [
                 _buildLanguageOption(
                   context,
@@ -61,11 +61,16 @@ class LanguageSelectorWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          displayName,
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: 16,
+        Flexible(
+          child: Text(
+            displayName,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black,
+              fontSize: 16,
+            ),
+            overflow:
+                TextOverflow
+                    .ellipsis, // Menambahkan ellipsis jika teks terlalu panjang
           ),
         ),
         Radio(
