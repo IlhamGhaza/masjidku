@@ -12,7 +12,7 @@ class FinanceReportPage extends StatefulWidget {
 }
 
 class _FinanceReportPageState extends State<FinanceReportPage> {
-   @override
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
@@ -23,20 +23,21 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
         final screenSize = MediaQuery.of(context).size;
         return Scaffold(
           backgroundColor: colorScheme.background,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
                   'Finance Report Page',
                   style: TextStyle(
                     color: colorScheme.onBackground,
                     fontSize: 24,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

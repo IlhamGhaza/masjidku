@@ -8,6 +8,8 @@ import 'core/theme/language_cubit.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/splash_page.dart';
+import 'package:quran_flutter/quran_flutter.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,7 @@ void main() async {
             : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
   await EasyLocalization.ensureInitialized();
+  await Quran.initialize();
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('id'), Locale('en')],

@@ -97,8 +97,8 @@ class _HomePageState extends State<HomePage> {
         final screenSize = MediaQuery.of(context).size;
         return Scaffold(
           backgroundColor: colorScheme.background,
-          body: SafeArea(
-            child: SingleChildScrollView(
+          body: 
+             SingleChildScrollView(
               child: Column(
                 spacing: 16,
                 children: [
@@ -194,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(height: 16),
                           _buildDateCard(
-                            "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+                            DateFormat('dd MMMM yyyy').format(DateTime.now()),
                             Hijriyah.fromDate(
                               DateTime.now().toLocal(),
                             ).toFormat("dd MMMM yyyy"),
@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Column(
-                      spacing:16 ,
+                      spacing: 16,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         //card prayer
@@ -586,13 +586,7 @@ class _HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.w500,
-                                                color:
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black
-                                                            .withValues(
-                                                              alpha: 0.7,
-                                                            ),
+                                                color: colorScheme.onBackground,
                                               ),
                                             ),
                                             Text(
@@ -600,26 +594,14 @@ class _HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
-                                                color:
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black
-                                                            .withValues(
-                                                              alpha: 0.5,
-                                                            ),
+                                                color: colorScheme.onBackground,
                                               ),
                                             ),
                                             Text(
                                               _announcements[index]['date'],
                                               style: TextStyle(
                                                 fontSize: 12,
-                                                color:
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black
-                                                            .withValues(
-                                                              alpha: 0.5,
-                                                            ),
+                                                color: colorScheme.onBackground,
                                               ),
                                             ),
                                           ],
@@ -645,7 +627,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           },
-                        ), 
+                        ),
                         //event section
                         SizedBox(
                           height: 173,
@@ -740,13 +722,7 @@ class _HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.w500,
-                                                color:
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black
-                                                            .withValues(
-                                                              alpha: 0.7,
-                                                            ),
+                                                color: colorScheme.onBackground,
                                               ),
                                             ),
                                             Text(
@@ -754,13 +730,7 @@ class _HomePageState extends State<HomePage> {
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
-                                                color:
-                                                    isDarkMode
-                                                        ? Colors.white
-                                                        : Colors.black
-                                                            .withValues(
-                                                              alpha: 0.5,
-                                                            ),
+                                                color: colorScheme.onBackground,
                                               ),
                                             ),
                                             Row(
@@ -769,12 +739,7 @@ class _HomePageState extends State<HomePage> {
                                                   Icons.access_time,
                                                   size: 12,
                                                   color:
-                                                      isDarkMode
-                                                          ? Colors.white
-                                                          : Colors.black
-                                                              .withValues(
-                                                                alpha: 0.5,
-                                                              ),
+                                                      colorScheme.onBackground,
                                                 ),
                                                 SizedBox(width: 4),
                                                 Text(
@@ -782,12 +747,8 @@ class _HomePageState extends State<HomePage> {
                                                   style: TextStyle(
                                                     fontSize: 12,
                                                     color:
-                                                        isDarkMode
-                                                            ? Colors.white
-                                                            : Colors.black
-                                                                .withValues(
-                                                                  alpha: 0.5,
-                                                                ),
+                                                        colorScheme
+                                                            .onBackground,
                                                   ),
                                                 ),
                                               ],
@@ -802,7 +763,7 @@ class _HomePageState extends State<HomePage> {
                             },
                           ),
                         ),
-                         //donate
+                        //donate
                         Column(
                           spacing: 5,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -813,10 +774,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    isDarkMode
-                                        ? Colors.white
-                                        : Colors.black.withValues(alpha: 0.7),
+                                color: colorScheme.onBackground,
                               ),
                             ),
                             SizedBox(
@@ -836,10 +794,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color:
-                                    isDarkMode
-                                        ? Colors.white
-                                        : Colors.black.withValues(alpha: 0.7),
+                                color: colorScheme.onBackground,
                               ),
                             ),
                             Text(
@@ -895,7 +850,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-          ),
+          
         );
       },
     );

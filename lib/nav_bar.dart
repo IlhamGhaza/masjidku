@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
-import 'features/activity_page.dart';
+import 'features/event/upcoming_event_page.dart';
 import 'features/home/presentation/home_page.dart';
 import 'features/quran/quran_page.dart';
 import 'features/financial/finance_report_page.dart';
 import 'features/account/presentation/profile_page.dart';
-import 'package:easy_localization/easy_localization.dart'; // Sesuaikan dengan package lokalisasi yang Anda gunakan
+import 'package:easy_localization/easy_localization.dart'; 
 
 class NavBar extends StatefulWidget {
   const NavBar({super.key});
@@ -23,7 +23,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
     const HomePage(),
     const QuranPage(),
     const FinanceReportPage(),
-    const ActivityPage(), //event
+    const UpcomingEventPage(), 
     const ProfilePage(),
   ];
 
@@ -133,7 +133,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                             selectedIcon: const Icon(
                               Icons.calendar_today_rounded,
                             ),
-                            label: Text('activity'.tr()),
+                            label: Text('event'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.person_outline_rounded),
@@ -253,7 +253,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.calendar_today_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'activity'.tr(),
+                        label: 'event'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(
