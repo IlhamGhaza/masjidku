@@ -4,7 +4,7 @@ import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/event/upcoming_event_page.dart';
 import 'features/home/presentation/home_page.dart';
-import 'features/quran/quran_page.dart';
+import 'features/quran/presentation/quran_page.dart';
 import 'features/financial/finance_report_page.dart';
 import 'features/account/presentation/profile_page.dart';
 import 'package:easy_localization/easy_localization.dart'; 

@@ -1,11 +1,15 @@
+import 'package:adhan/adhan.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
+import '../../core/utils/permisson_utils.dart';
+import '../../data/datasource/db_local_datasource.dart';
 
 class PrayerPage extends StatefulWidget {
   const PrayerPage({super.key});
@@ -15,6 +19,182 @@ class PrayerPage extends StatefulWidget {
 }
 
 class _PrayerPageState extends State<PrayerPage> {
+  var myCoordinates = Coordinates(-6.537132990026773, 106.79284326451504);
+  final params = CalculationMethod.singapore.getParameters();
+  String? imsak;
+  String? fajr;
+  String? sunrise;
+  String? dhuhr;
+  String? asr;
+  String? maghrib;
+  String? isha;
+
+  void calculatePrayerTimes(DateTime date) {
+    DateComponents dateComponents = DateComponents(
+      date.year,
+      date.month,
+      date.day,
+    );
+    final prayerTimes = PrayerTimes(myCoordinates, dateComponents, params);
+
+    setState(() {
+      imsak = DateFormat.jm().format(
+        prayerTimes.fajr.subtract(Duration(minutes: 10)),
+      );
+      fajr = DateFormat.jm().format(prayerTimes.fajr);
+      sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+      dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+      asr = DateFormat.jm().format(prayerTimes.asr);
+      maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+      isha = DateFormat.jm().format(prayerTimes.isha);
+      selectedDate = date;
+    });
+  }
+
+  void onChangeDate(int days) {
+    DateTime newDate = selectedDate.add(Duration(days: days));
+    calculatePrayerTimes(newDate);
+  }
+
+  refreshLocation() async {
+    try {
+      final permissionStatus = await requestLocationPermission();
+      if (permissionStatus) {
+        final location = await determinePosition();
+        myCoordinates = Coordinates(location.latitude, location.longitude);
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          location.latitude,
+          location.longitude,
+        );
+
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks[0];
+          locationNow = "${place.subAdministrativeArea}, ${place.country}";
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
+
+          imsak = DateFormat.jm().format(
+            prayerTimes.fajr.subtract(Duration(minutes: 10)),
+          );
+          fajr = DateFormat.jm().format(prayerTimes.fajr);
+          sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+          dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+          asr = DateFormat.jm().format(prayerTimes.asr);
+          maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+          isha = DateFormat.jm().format(prayerTimes.isha);
+          setState(() {});
+        }
+        await DbLocalDatasource().saveLatLng(
+          location.latitude,
+          location.longitude,
+        );
+      } else {
+        // Show snackbar when permission is denied
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.tr('location_permission_denied')),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  loadLocation() async {
+    try {
+      final permissionStatus = await requestLocationPermission();
+      final latLng = await DbLocalDatasource().getLatLng();
+
+      if (latLng.isEmpty) {
+        if (permissionStatus) {
+          refreshLocation();
+        } else {
+          // Show snackbar when permission is denied
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  context.tr('location permission denied, please enable it'),
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+          // Use default coordinates
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
+          updatePrayerTimes(prayerTimes);
+        }
+      } else {
+        double lat = latLng[0];
+        double lng = latLng[1];
+        try {
+          List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+          if (placemarks.isNotEmpty) {
+            myCoordinates = Coordinates(lat, lng);
+            Placemark place = placemarks[0];
+            locationNow = "${place.subAdministrativeArea}, ${place.country}";
+            final prayerTimes = PrayerTimes.today(myCoordinates, params);
+            updatePrayerTimes(prayerTimes);
+          }
+        } catch (e) {
+          // If geocoding fails, still calculate prayer times with saved coordinates
+          myCoordinates = Coordinates(lat, lng);
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
+          updatePrayerTimes(prayerTimes);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
+  void updatePrayerTimes(PrayerTimes prayerTimes) {
+    setState(() {
+      imsak = DateFormat.jm().format(
+        prayerTimes.fajr.subtract(Duration(minutes: 10)),
+      );
+      fajr = DateFormat.jm().format(prayerTimes.fajr);
+      sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+      dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+      asr = DateFormat.jm().format(prayerTimes.asr);
+      maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+      isha = DateFormat.jm().format(prayerTimes.isha);
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    loadLocation();
+    params.madhab = Madhab.shafi;
+    super.initState();
+  }
+
+  DateTime selectedDate = DateTime.now();
+  String locationNow = 'Kab Bogor, Indonesia';
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeMode>(
@@ -235,17 +415,21 @@ class _PrayerPageState extends State<PrayerPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "hari ini",
+                                        DateFormat(
+                                          'dd MMMM yyyy',
+                                        ).format(DateTime.now()),
                                         style: TextStyle(
                                           color: colorScheme.onBackground,
-                                          fontSize: 16,
+                                          fontSize: 20,
                                         ),
                                       ),
                                       Text(
-                                        "hij",
+                                        Hijriyah.fromDate(
+                                          DateTime.now().toLocal(),
+                                        ).toFormat("dd MMMM yyyy"),
                                         style: TextStyle(
                                           color: colorScheme.onBackground,
-                                          fontSize: 16,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ],
