@@ -31,7 +31,7 @@ class _QuranPageState extends State<QuranPage>
 
   void loadData() async {
     final bookmark = await DbLocalDatasource().getBookmark();
-    if (bookmark != null) {
+    if (mounted) {
       setState(() {
         bookmarkModel = bookmark;
       });

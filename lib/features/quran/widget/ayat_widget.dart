@@ -6,16 +6,21 @@ import 'package:quran_flutter/quran_flutter.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../data/model/bookmark_model.dart';
 
 class AyatWidget extends StatefulWidget {
   final Verse verse;
   final QuranLanguage translationLanguage;
   final Map<int, Map<int, Verse>> translatedVerses;
+  final Function(Verse verse)? onBookmarkPressed;
+  final BookmarkModel? bookmarkModel;
   const AyatWidget({
     super.key,
     required this.verse,
     required this.translationLanguage,
     required this.translatedVerses,
+    this.onBookmarkPressed,
+    this.bookmarkModel,
   });
 
   @override
@@ -23,7 +28,7 @@ class AyatWidget extends StatefulWidget {
 }
 
 class _AyatWidgetState extends State<AyatWidget> {
- void _copyAllText() {
+  void _copyAllText() {
     String textToCopy =
         '${widget.verse.text}\n\n${widget.translatedVerses[widget.verse.surahNumber]![widget.verse.verseNumber]!.text}\n(Qs. ${widget.verse.surahNumber}: ${widget.verse.verseNumber})';
     Clipboard.setData(ClipboardData(text: textToCopy));
@@ -47,7 +52,10 @@ class _AyatWidgetState extends State<AyatWidget> {
 
     //snackbar
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Oops something went wrong'), backgroundColor: Colors.red),
+      SnackBar(
+        content: Text('Oops something went wrong'),
+        backgroundColor: Colors.red,
+      ),
     );
   }
 
@@ -60,7 +68,7 @@ class _AyatWidgetState extends State<AyatWidget> {
 
         final colorScheme = theme.colorScheme;
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
@@ -72,13 +80,38 @@ class _AyatWidgetState extends State<AyatWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: colorScheme.primary,
-                child: Text(
-                  widget.verse.verseNumber.toString(),
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: colorScheme.primary,
+                    child: Text(
+                      widget.verse.verseNumber.toString(),
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      if (widget.onBookmarkPressed != null) {
+                        widget.onBookmarkPressed!(widget.verse);
+                      }
+                    },
+                    icon: Icon(
+                      Icons.done_all,
+                      // Check if this verse is the bookmarked verse
+                      color:
+                          (widget.bookmarkModel != null &&
+                                  widget.bookmarkModel!.suratNumber ==
+                                      widget.verse.surahNumber &&
+                                  widget.bookmarkModel!.ayatNumber ==
+                                      widget.verse.verseNumber)
+                              ? colorScheme.primary
+                              : Colors.grey.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Align(
@@ -135,7 +168,12 @@ class _AyatWidgetState extends State<AyatWidget> {
                     Icons.bookmark,
                     () {},
                   ),
-                  _buildRowSection(colorScheme, 'Share', Icons.share,_shareAyat),
+                  _buildRowSection(
+                    colorScheme,
+                    'Share',
+                    Icons.share,
+                    _shareAyat,
+                  ),
                   _buildRowSection(
                     colorScheme,
                     'Copy',

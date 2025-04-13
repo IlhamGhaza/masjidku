@@ -23,7 +23,7 @@ class AyatPage extends StatefulWidget {
     this.lastReading = false,
     this.bookmarkModel,
   });
-   factory AyatPage.ofSurah(
+  factory AyatPage.ofSurah(
     Surah surah, {
     bool lastReading = false,
     BookmarkModel? bookmark,
@@ -101,7 +101,7 @@ class _AyatPageState extends State<AyatPage> {
         return Scaffold(
           backgroundColor: colorScheme.background,
           appBar: AppBar(
-            title:  Text('Surah ${surah!.nameEnglish}'),
+            title: Text('Surah ${surah!.nameEnglish}'),
             centerTitle: true,
             backgroundColor: colorScheme.primary,
           ),
@@ -234,62 +234,63 @@ class _AyatPageState extends State<AyatPage> {
                       ),
                     );
                   } else if (item is Verse) {
-                    return GestureDetector(
-                      onLongPress: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text("Simpan Bacaan Terakhir"),
-                              content: Text(
-                                "Apakah Anda ingin menyimpan bacaan terakhir di Surah ${surah!.nameEnglish} , Ayat ${item.verseNumber}?",
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text("Batal"),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    BookmarkModel model = BookmarkModel(
-                                      surah!.nameEnglish,
-                                      surah!.number,
-                                      item.verseNumber,
-                                    );
-                                    await DbLocalDatasource().saveBookmark(
-                                      model,
-                                    );
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Bacaan terakhir disimpan!",
-                                          style: TextStyle(
-                                            color: Colors.white,
+                    return Column(
+                      children: [
+                        AyatWidget(
+                          verse: item,
+                          translationLanguage: translationLanguage,
+                          translatedVerses: translatedVerses,
+                          bookmarkModel: widget.bookmarkModel,
+                          onBookmarkPressed: (verse) {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Simpan Bacaan Terakhir"),
+                                  content: Text(
+                                    "Apakah Anda ingin menyimpan bacaan terakhir di Surah ${surah!.nameEnglish} , Ayat ${verse.verseNumber}?",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Batal"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        BookmarkModel model = BookmarkModel(
+                                          surah!.nameEnglish,
+                                          surah!.number,
+                                          verse.verseNumber,
+                                        );
+                                        await DbLocalDatasource().saveBookmark(
+                                          model,
+                                        );
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              "Bacaan terakhir disimpan!",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            backgroundColor: Colors.green,
                                           ),
-                                        ),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                  },
-                                  child: Text("Simpan"),
-                                ),
-                              ],
+                                        );
+                                      },
+                                      child: Text("Simpan"),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      child: Column(
-                        children: [
-                          AyatWidget(
-                            verse: item,
-                            translationLanguage: translationLanguage,
-                            translatedVerses: translatedVerses,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   } else {
                     return Container();
@@ -339,9 +340,7 @@ class _AyatPageState extends State<AyatPage> {
                                     MaterialPageRoute(
                                       builder:
                                           (context) =>
-                                              AyatPage.ofSurah(
-                                            previousSurah!,
-                                          ),
+                                              AyatPage.ofSurah(previousSurah!),
                                     ),
                                   );
                                 }

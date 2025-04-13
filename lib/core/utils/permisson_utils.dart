@@ -64,3 +64,11 @@ Future<Position> determinePosition() async {
   // continue accessing the position of the device.
   return await Geolocator.getCurrentPosition();
 }
+
+// SnackBar(
+//           content: Text(
+//             'Location permissions are denied, pleaase allow location permissions.',
+//             style: TextStyle(color: Colors.white),
+//           ),
+//           backgroundColor: Colors.red,
+//         ),

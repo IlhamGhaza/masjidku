@@ -92,7 +92,7 @@ class _PrayerPageState extends State<PrayerPage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.tr('location_permission_denied')),
+              content: Text(context.tr('location permission denied')),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -213,16 +213,27 @@ class _PrayerPageState extends State<PrayerPage> {
             actions: [
               //calender
               IconButton(
-                onPressed: () {
-                  showDatePicker(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                     locale: const Locale('id', 'ID'),
                   );
+
+                  if (pickedDate != null) {
+                    selectedDate = pickedDate;
+                    calculatePrayerTimes(pickedDate);
+                  }
                 },
                 icon: const Icon(Icons.calendar_month),
+              ),
+              IconButton(
+                onPressed: () {
+                  loadLocation();
+                },
+                icon: const Icon(Icons.refresh),
               ),
             ],
           ),
@@ -244,7 +255,6 @@ class _PrayerPageState extends State<PrayerPage> {
                   // child:
                   // ),
                   //widget
-
                   // Transform.translate(
                   //   offset: const Offset(0, -50),
                   //   child: Container(
@@ -335,7 +345,9 @@ class _PrayerPageState extends State<PrayerPage> {
                                     color: colorScheme.onBackground,
                                     size: 20,
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    onChangeDate(-1);
+                                  },
                                 ),
                                 IconButton(
                                   padding: EdgeInsets.zero,
@@ -345,7 +357,9 @@ class _PrayerPageState extends State<PrayerPage> {
                                     color: colorScheme.onBackground,
                                     size: 20,
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    onChangeDate(1);
+                                  },
                                 ),
                               ],
                             ),
@@ -417,18 +431,18 @@ class _PrayerPageState extends State<PrayerPage> {
                                       Text(
                                         DateFormat(
                                           'dd MMMM yyyy',
-                                        ).format(DateTime.now()),
+                                        ).format(selectedDate),
                                         style: TextStyle(
-                                          color: colorScheme.onBackground,
+                                          color: Colors.white,
                                           fontSize: 20,
                                         ),
                                       ),
                                       Text(
                                         Hijriyah.fromDate(
-                                          DateTime.now().toLocal(),
+                                          selectedDate.toLocal(),
                                         ).toFormat("dd MMMM yyyy"),
                                         style: TextStyle(
-                                          color: colorScheme.onBackground,
+                                          color: Colors.white,
                                           fontSize: 14,
                                         ),
                                       ),
@@ -446,38 +460,38 @@ class _PrayerPageState extends State<PrayerPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       _rowjadwalSholat(
-                                        'imsak',
-                                        '04:00',
+                                        'Imsak',
+                                        imsak ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Shubuh',
-                                        '04:45',
+                                        fajr ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Terbit',
-                                        '06:00',
+                                        sunrise ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Zuhur',
-                                        '04:00',
+                                        dhuhr ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Asrar',
-                                        '04:00',
+                                        asr ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Maghrib',
-                                        '04:00',
+                                        isha ?? "-",
                                         colorScheme,
                                       ),
                                       _rowjadwalSholat(
                                         'Isya',
-                                        '19:00',
+                                        isha ?? "-",
                                         colorScheme,
                                       ),
                                     ],

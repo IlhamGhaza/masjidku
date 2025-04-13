@@ -2,7 +2,7 @@
 // import 'package:permission_handler/permission_handler.dart';
 
 // class AlarmPermissions {
-//   // static final _log = Logger('AlarmPermissions');
+//   static final _log = Logger('AlarmPermissions');
 
 //   static Future<void> checkNotificationPermission() async {
 //     final status = await Permission.notification.status;
