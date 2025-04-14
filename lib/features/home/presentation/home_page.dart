@@ -1,13 +1,18 @@
 import 'dart:math';
 
+import 'package:adhan/adhan.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
+import 'package:quran_flutter/quran_flutter.dart';
 import 'dart:ui';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../core/utils/prayertimeinfo.dart';
+import '../../../data/datasource/db_local_datasource.dart';
 import '../../event/announcement_page.dart';
 import '../../event/upcoming_event_page.dart';
 import '../../prayer/prayer_page.dart';
@@ -40,15 +45,6 @@ class _HomePageState extends State<HomePage> {
       'time': '08:00',
     },
   ];
-
-  final List<Map<String, dynamic>> prayerTimes = [
-    {'name': 'Fajr', 'time': '5:30 AM', 'status': 'Started'},
-    {'name': 'Dhuhr', 'time': '1:15 PM', 'status': ''},
-    {'name': 'Asr', 'time': '4:45 PM', 'status': ''},
-    {'name': 'Maghrib', 'time': '7:20 PM', 'status': ''},
-    {'name': 'Isha', 'time': '8:45 PM', 'status': ''},
-  ];
-
   //annoucement (icon, title, desc, date)
   final List<Map<String, dynamic>> _announcements = [
     {
@@ -84,6 +80,144 @@ class _HomePageState extends State<HomePage> {
     // Pilih warna secara acak saat widget diinisialisasi
     final random = Random();
     _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
+    isloading = true;
+    now = DateFormat('dd MMMM yyyy').format(DateTime.now());
+    // _calculatePrayerTimes();
+    
+    // Verse verse = Quran.getVerse(surahNumber: 1, verseNumber: 5);
+    // print(verse.text);
+  }
+
+  String locationNow = 'Kabupaten Bogor, Jawa Barat, Indonesia';
+  PrayerTimes? prayerTimes;
+  String nextPrayerName = 'Tidak diketahui';
+
+  String? nextPrayerTime;
+  Duration countdownDuration = Duration.zero;
+  // Timer? countdownTimer;
+  String? now;
+  Verse? lastVerseRead;
+  Verse? lastVerseReadTranslate;
+
+  bool isloading = true;
+  var myCoordinates = Coordinates(-6.537132990026773, 106.79284326451504);
+  final params = CalculationMethod.singapore.getParameters();
+  String? imsak;
+  String? fajr;
+  String? sunrise;
+  String? dhuhr;
+  String? asr;
+  String? maghrib;
+  String? isha;
+  String currentPrayerName = 'Tidak diketahui';
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    return "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}";
+  }
+
+  void _calculatePrayerTimes() async {
+    setState(() {
+      isloading = true;
+    });
+
+    try {
+      List latLng = await DbLocalDatasource().getLatLng();
+      double? lat;
+      double? lng;
+
+      if (latLng.isNotEmpty) {
+        lat = latLng[0];
+        lng = latLng[1];
+      } else {
+        // Default coordinates if none are available
+        lat = -7.797068;
+        lng = 110.370529;
+      }
+
+      // Lokasi (ganti dengan koordinat lokasi pengguna)
+      myCoordinates = Coordinates(lat!, lng!);
+      final params = CalculationMethod.singapore.getParameters();
+      params.madhab = Madhab.shafi;
+
+      final date = DateComponents.from(DateTime.now());
+      final prayerTimes = PrayerTimes(myCoordinates, date, params);
+
+      // Get prayer times
+      String imsak = DateFormat.jm().format(
+        prayerTimes.fajr.subtract(Duration(minutes: 10)),
+      );
+      String fajr = DateFormat.jm().format(prayerTimes.fajr);
+      String sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+      String dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+      String asr = DateFormat.jm().format(prayerTimes.asr);
+      String maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+      String isha = DateFormat.jm().format(prayerTimes.isha);
+
+      // Get the next prayer info using PrayerTimeUtils
+      final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
+        imsak: imsak,
+        fajr: fajr,
+        sunrise: sunrise,
+        dhuhr: dhuhr,
+        asr: asr,
+        maghrib: maghrib,
+        isha: isha,
+      );
+
+      // Get current prayer
+      var currentPrayer = PrayerTimeUtils.getCurrentPrayer(
+        imsak: imsak,
+        fajr: fajr,
+        sunrise: sunrise,
+        dhuhr: dhuhr,
+        asr: asr,
+        maghrib: maghrib,
+        isha: isha,
+      );
+
+      // Set default location in case geocoding fails
+      String location = "${lat.toStringAsFixed(2)}, ${lng.toStringAsFixed(2)}";
+
+      try {
+        if (GeocodingPlatform.instance != null) {
+          List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+          if (placemarks.isNotEmpty) {
+            Placemark place = placemarks[0];
+            if (place.subAdministrativeArea != null && place.country != null) {
+              location = "${place.subAdministrativeArea}, ${place.country}";
+            }
+          }
+        }
+      } catch (e) {
+        print("Error getting location name: $e");
+        // Keep using the default location string
+      }
+
+      setState(() {
+        locationNow = location;
+        nextPrayerName = nextPrayerInfo.name;
+        nextPrayerTime = DateFormat.jm().format(nextPrayerInfo.time);
+        countdownDuration = nextPrayerInfo.time.difference(DateTime.now());
+        currentPrayer = currentPrayer;
+
+        // Store all prayer times for display
+        this.fajr = fajr;
+        this.sunrise = sunrise;
+        this.dhuhr = dhuhr;
+        this.asr = asr;
+        this.maghrib = maghrib;
+        this.isha = isha;
+        this.imsak = imsak;
+
+        isloading = false;
+      });
+    } catch (e) {
+      print("Error calculating prayer times: $e");
+      setState(() {
+        isloading = false;
+      });
+    }
   }
 
   @override
@@ -324,7 +458,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        'Maghrib: ',
+                                        '$currentPrayerName: ',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -332,7 +466,19 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Text(
-                                        '18:15',
+                                        currentPrayerName == 'Shubuh'
+                                            ? fajr ?? '05:00'
+                                            : currentPrayerName == 'Terbit'
+                                            ? sunrise ?? '06:15'
+                                            : currentPrayerName == 'Zuhur'
+                                            ? dhuhr ?? '12:00'
+                                            : currentPrayerName == 'Ashar'
+                                            ? asr ?? '15:30'
+                                            : currentPrayerName == 'Maghrib'
+                                            ? maghrib ?? '18:15'
+                                            : currentPrayerName == 'Isya'
+                                            ? isha ?? '19:30'
+                                            : '00:00',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
@@ -372,7 +518,7 @@ class _HomePageState extends State<HomePage> {
                                           size: 18,
                                         ),
                                         Text(
-                                          '-2:00',
+                                          _formatDuration(countdownDuration),
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -387,7 +533,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         Text(
-                                          'Fajr',
+                                          nextPrayerName,
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -426,6 +572,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
+
                             // Prayer time indicator
                             Positioned(
                               top: 70,

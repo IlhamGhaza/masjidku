@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../core/utils/snackbar_utils.dart';
 import '../../../data/datasource/db_local_datasource.dart';
 import '../../../data/model/bookmark_model.dart';
 import '../widget/ayat_widget.dart';
@@ -35,7 +37,8 @@ class AyatPage extends StatefulWidget {
   State<AyatPage> createState() => _AyatPageState();
 }
 
-class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin {
+class _AyatPageState extends State<AyatPage>
+    with SingleTickerProviderStateMixin {
   String getSurahType(String type) {
     return type.toLowerCase() == 'meccan' ? 'Mekah' : 'Madinah';
   }
@@ -78,11 +81,11 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollToLastRead();
     });
-    
+
     surah = widget.surah;
     juz = widget.juz;
     page = widget.page;
@@ -117,16 +120,14 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
         final theme = isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme;
         final colorScheme = theme.colorScheme;
         final screenSize = MediaQuery.of(context).size;
-        
+
         return Scaffold(
           backgroundColor: colorScheme.background,
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text(
               'Surah ${surah!.nameEnglish}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
             backgroundColor: colorScheme.primary.withOpacity(0.9),
@@ -214,7 +215,6 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                               ),
                             );
                           }
-
                         },
                       ),
                       _buildNavigationButton(
@@ -225,7 +225,7 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                         Icons.arrow_forward_ios,
                         Alignment.centerRight,
                         () {
-                         if (nextSurah != null) {
+                          if (nextSurah != null) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -249,7 +249,9 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                     backgroundColor: colorScheme.primary,
                     onPressed: _toggleNavigation,
                     child: Icon(
-                      _showNavigation ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up,
+                      _showNavigation
+                          ? Icons.keyboard_arrow_down
+                          : Icons.keyboard_arrow_up,
                       color: Colors.white,
                     ),
                   ).animate().fadeIn(duration: 500.ms, delay: 300.ms),
@@ -262,7 +264,11 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildSurahHeader(Surah surah, ColorScheme colorScheme, Size screenSize) {
+  Widget _buildSurahHeader(
+    Surah surah,
+    ColorScheme colorScheme,
+    Size screenSize,
+  ) {
     return SingleChildScrollView(
       child: Container(
         color: colorScheme.background,
@@ -302,111 +308,140 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        surah.name,
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontFamily: "Uthmanic",
-                        ),
-                      ).animate()
-                        .fadeIn(duration: 600.ms)
-                        .slideY(begin: -0.2, end: 0, duration: 600.ms, curve: Curves.easeOutQuart),
-                      
+                            surah.name,
+                            style: const TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: "Uthmanic",
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms)
+                          .slideY(
+                            begin: -0.2,
+                            end: 0,
+                            duration: 600.ms,
+                            curve: Curves.easeOutQuart,
+                          ),
+
                       const SizedBox(height: 8),
-                      
+
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            surah.nameEnglish,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                surah.nameEnglish,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                '(${surah.meaning})',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 200.ms)
+                          .slideY(
+                            begin: -0.2,
+                            end: 0,
+                            duration: 600.ms,
+                            delay: 200.ms,
+                            curve: Curves.easeOutQuart,
                           ),
-                          const SizedBox(width: 5),
-                          Text(
-                            '(${surah.meaning})',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ).animate()
-                        .fadeIn(duration: 600.ms, delay: 200.ms)
-                        .slideY(begin: -0.2, end: 0, duration: 600.ms, delay: 200.ms, curve: Curves.easeOutQuart),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       _buildSurahDetail(
-                        '${surah.number}',
-                        '${surah.verseCount}',
-                        getSurahType(surah.type.toString()),
-                      ).animate()
-                        .fadeIn(duration: 600.ms, delay: 400.ms)
-                        .slideY(begin: 0.2, end: 0, duration: 600.ms, delay: 400.ms, curve: Curves.easeOutQuart),
+                            '${surah.number}',
+                            '${surah.verseCount}',
+                            getSurahType(surah.type.toString()),
+                          )
+                          .animate()
+                          .fadeIn(duration: 600.ms, delay: 400.ms)
+                          .slideY(
+                            begin: 0.2,
+                            end: 0,
+                            duration: 600.ms,
+                            delay: 400.ms,
+                            curve: Curves.easeOutQuart,
+                          ),
                     ],
                   ),
                 ),
               ),
             ),
-            
+
             // Bismillah container
             Container(
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
+                  width: double.infinity,
+                  margin: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: colorScheme.surface,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: Center(
-                child: Text(
-                  Quran.bismillah,
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: colorScheme.primary,
-                    fontFamily: "Uthmanic",
+                  child: Center(
+                    child: Text(
+                      Quran.bismillah,
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: colorScheme.primary,
+                        fontFamily: "Uthmanic",
+                      ),
+                    ),
                   ),
+                )
+                .animate()
+                .fadeIn(duration: 800.ms, delay: 600.ms)
+                .scale(
+                  begin: const Offset(0.9, 0.9),
+                  end: const Offset(1, 1),
+                  duration: 800.ms,
+                  delay: 600.ms,
                 ),
-              ),
-            ).animate()
-              .fadeIn(duration: 800.ms, delay: 600.ms)
-              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1, 1), duration: 800.ms, delay: 600.ms),
-            
+
             // Play all button
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.volume_up),
-                label: const Text('Putar Semua'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.secondary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                                  elevation: 2,
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.volume_up),
+                    label: const Text('Putar Semua'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.secondary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 20,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 2,
                     ),
                   ),
                 )
                 .animate()
                 .fadeIn(duration: 600.ms, delay: 800.ms)
                 .slideX(begin: -0.2, end: 0, duration: 600.ms, delay: 800.ms),
-      
+
             const Divider(height: 32, thickness: 1),
           ],
         ),
@@ -463,7 +498,7 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
     final bool isEnabled = targetSurah != null;
 
     return Container(
-      width: screenSize.width * 0.45,
+      width: screenSize.width * 0.43,
       height: 90,
       decoration: BoxDecoration(
         color:
@@ -620,8 +655,8 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                               vertical: 10,
                             ),
                           ),
-                          child: const Text(
-                            "Batal",
+                          child: Text(
+                            context.tr("cancel"),
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
@@ -640,30 +675,11 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                             Navigator.pop(context);
 
                             if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.check_circle,
-                                        color: Colors.white,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      const Text(
-                                        "Bacaan terakhir disimpan!",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                  backgroundColor: Colors.green,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  margin: const EdgeInsets.all(12),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
+                              SnackbarUtils(
+                                backgroundColor: Colors.green,
+                                text: "save_last_read".tr(),
+                                // icon: Icons.check_circle,
+                              ).showSuccessSnackBar(context);
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -677,8 +693,8 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text(
-                            "Simpan",
+                          child: Text(
+                            context.tr("save"),
                             style: TextStyle(fontSize: 16),
                           ),
                         ),
@@ -699,4 +715,3 @@ class _AyatPageState extends State<AyatPage> with SingleTickerProviderStateMixin
     );
   }
 }
-

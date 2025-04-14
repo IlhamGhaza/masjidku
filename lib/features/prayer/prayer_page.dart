@@ -10,6 +10,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
 import '../../core/utils/permisson_utils.dart';
+import '../../core/utils/prayertimeinfo.dart';
 import '../../data/datasource/db_local_datasource.dart';
 
 class PrayerPage extends StatefulWidget {
@@ -637,30 +638,44 @@ class _PrayerPageState extends State<PrayerPage>
     );
   }
 
+  // Add this import at the top of the file
+
+  // Then modify the _buildPrayerTimeCard method
   Widget _buildPrayerTimeCard(
     String name,
     String time,
     ColorScheme colorScheme,
     int index,
   ) {
-    // Determine if this prayer time is the next upcoming prayer
-    bool isNextPrayer = _isNextPrayer(name);
+    // Get the current prayer
+    final currentPrayer = PrayerTimeUtils.getCurrentPrayer(
+      imsak: imsak,
+      fajr: fajr,
+      sunrise: sunrise,
+      dhuhr: dhuhr,
+      asr: asr,
+      maghrib: maghrib,
+      isha: isha,
+    );
+
+    // Check if this is the current prayer
+    final isCurrentPrayer = (name == currentPrayer);
 
     return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: Container(
             decoration: BoxDecoration(
               color:
-                  isNextPrayer
+                  isCurrentPrayer
                       ? colorScheme.primaryContainer.withOpacity(0.3)
                       : colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
-                    isNextPrayer
+                    isCurrentPrayer
                         ? colorScheme.primary
                         : colorScheme.outline.withOpacity(0.2),
-                width: isNextPrayer ? 1.5 : 1,
+                width: isCurrentPrayer ? 1.5 : 1,
               ),
             ),
             child: Padding(
@@ -678,7 +693,7 @@ class _PrayerPageState extends State<PrayerPage>
                         height: 40,
                         decoration: BoxDecoration(
                           color:
-                              isNextPrayer
+                              isCurrentPrayer
                                   ? colorScheme.primary
                                   : colorScheme.surfaceVariant,
                           borderRadius: BorderRadius.circular(10),
@@ -686,7 +701,7 @@ class _PrayerPageState extends State<PrayerPage>
                         child: Icon(
                           _getPrayerIcon(name),
                           color:
-                              isNextPrayer
+                              isCurrentPrayer
                                   ? Colors.white
                                   : colorScheme.onSurfaceVariant,
                           size: 20,
@@ -698,10 +713,32 @@ class _PrayerPageState extends State<PrayerPage>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight:
-                              isNextPrayer ? FontWeight.bold : FontWeight.w500,
+                              isCurrentPrayer
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                           color: colorScheme.onBackground,
                         ),
                       ),
+                      if (isCurrentPrayer)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Now',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                   Row(
@@ -711,9 +748,11 @@ class _PrayerPageState extends State<PrayerPage>
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight:
-                              isNextPrayer ? FontWeight.bold : FontWeight.w500,
+                              isCurrentPrayer
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
                           color:
-                              isNextPrayer
+                              isCurrentPrayer
                                   ? colorScheme.primary
                                   : colorScheme.onBackground,
                         ),
@@ -727,14 +766,14 @@ class _PrayerPageState extends State<PrayerPage>
                         icon: Icon(
                           Icons.notifications_outlined,
                           color:
-                              isNextPrayer
+                              isCurrentPrayer
                                   ? colorScheme.primary
                                   : colorScheme.onSurfaceVariant,
                           size: 20,
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor:
-                              isNextPrayer
+                              isCurrentPrayer
                                   ? colorScheme.primaryContainer.withOpacity(
                                     0.5,
                                   )
@@ -775,20 +814,20 @@ class _PrayerPageState extends State<PrayerPage>
     }
   }
 
-  bool _isNextPrayer(String prayerName) {
-    // Logic to determine if this is the next prayer time
-    // This is a placeholder - you would implement actual logic based on current time
-    DateTime now = DateTime.now();
+  // bool _isNextPrayer(String prayerName) {
+  //   // Logic to determine if this is the next prayer time
+  //   // This is a placeholder - you would implement actual logic based on current time
+  //   DateTime now = DateTime.now();
 
-    // Example implementation (simplified)
-    if (prayerName == 'Shubuh' && now.hour < 5) return true;
-    if (prayerName == 'Zuhur' && now.hour >= 5 && now.hour < 12) return true;
-    if (prayerName == 'Ashar' && now.hour >= 12 && now.hour < 15) return true;
-    if (prayerName == 'Maghrib' && now.hour >= 15 && now.hour < 18) return true;
-    if (prayerName == 'Isya' && now.hour >= 18) return true;
+  //   // Example implementation (simplified)
+  //   if (prayerName == 'Shubuh' && now.hour < 5) return true;
+  //   if (prayerName == 'Zuhur' && now.hour >= 5 && now.hour < 12) return true;
+  //   if (prayerName == 'Ashar' && now.hour >= 12 && now.hour < 15) return true;
+  //   if (prayerName == 'Maghrib' && now.hour >= 15 && now.hour < 18) return true;
+  //   if (prayerName == 'Isya' && now.hour >= 18) return true;
 
-    return false;
-  }
+  //   return false;
+  // }
 
   void _showSetAlarmDialog(
     BuildContext context,
@@ -844,12 +883,20 @@ class _PrayerPageState extends State<PrayerPage>
   }
 
   Widget _buildNextPrayerIndicator(ColorScheme colorScheme) {
-    // Get the next prayer time (this is a placeholder - implement actual logic)
-    String nextPrayer = 'Maghrib';
-    String nextTime = '6:30 PM';
+    // Get the next prayer time using our utility class
+    final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
+      imsak: imsak,
+      fajr: fajr,
+      sunrise: sunrise,
+      dhuhr: dhuhr,
+      asr: asr,
+      maghrib: maghrib,
+      isha: isha,
+    );
 
-    // Calculate time remaining (placeholder)
-    String timeRemaining = '2h 15m';
+    final nextPrayer = nextPrayerInfo.name;
+    final nextTime = DateFormat.jm().format(nextPrayerInfo.time);
+    final timeRemaining = nextPrayerInfo.timeRemaining;
 
     return Container(
       width: double.infinity,
