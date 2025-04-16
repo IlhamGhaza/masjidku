@@ -348,7 +348,7 @@ class _PrayerPageState extends State<PrayerPage>
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   colorScheme.primary,
-                                  colorScheme.primary.withOpacity(0.8),
+                                  colorScheme.primary.withValues(alpha: 0.8),
                                 ],
                               ),
                             ),
@@ -461,13 +461,17 @@ class _PrayerPageState extends State<PrayerPage>
                                       color: colorScheme.surface,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.05,
+                                          ),
                                           offset: const Offset(0, 1),
                                           blurRadius: 3,
                                           spreadRadius: 0,
                                         ),
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.06),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.06,
+                                          ),
                                           offset: const Offset(0, 3),
                                           blurRadius: 8,
                                           spreadRadius: 0,
@@ -493,8 +497,8 @@ class _PrayerPageState extends State<PrayerPage>
                                               end: Alignment.bottomRight,
                                               colors: [
                                                 colorScheme.primary,
-                                                colorScheme.primary.withOpacity(
-                                                  0.8,
+                                                colorScheme.primary.withValues(
+                                                  alpha: 0.8,
                                                 ),
                                               ],
                                             ),
@@ -544,7 +548,9 @@ class _PrayerPageState extends State<PrayerPage>
                                                         const EdgeInsets.all(8),
                                                     decoration: BoxDecoration(
                                                       color: Colors.white
-                                                          .withOpacity(0.2),
+                                                          .withValues(
+                                                            alpha: 0.2,
+                                                          ),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             12,
@@ -667,14 +673,14 @@ class _PrayerPageState extends State<PrayerPage>
             decoration: BoxDecoration(
               color:
                   isCurrentPrayer
-                      ? colorScheme.primaryContainer.withOpacity(0.3)
+                      ? colorScheme.primaryContainer.withValues(alpha: 0.3)
                       : colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
                     isCurrentPrayer
                         ? colorScheme.primary
-                        : colorScheme.outline.withOpacity(0.2),
+                        : colorScheme.outline.withValues(alpha: 0.2),
                 width: isCurrentPrayer ? 1.5 : 1,
               ),
             ),
@@ -774,8 +780,8 @@ class _PrayerPageState extends State<PrayerPage>
                         style: IconButton.styleFrom(
                           backgroundColor:
                               isCurrentPrayer
-                                  ? colorScheme.primaryContainer.withOpacity(
-                                    0.5,
+                                  ? colorScheme.primaryContainer.withValues(
+                                    alpha: 0.5,
                                   )
                                   : Colors.transparent,
                           padding: EdgeInsets.all(8),
@@ -902,11 +908,11 @@ class _PrayerPageState extends State<PrayerPage>
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withOpacity(0.7),
+        color: colorScheme.primaryContainer.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -957,8 +963,8 @@ class _PrayerPageState extends State<PrayerPage>
                         nextTime,
                         style: TextStyle(
                           fontSize: 14,
-                          color: colorScheme.onPrimaryContainer.withOpacity(
-                            0.8,
+                          color: colorScheme.onPrimaryContainer.withValues(
+                            alpha: 0.8,
                           ),
                         ),
                       ),

@@ -130,7 +130,7 @@ class _AyatPageState extends State<AyatPage>
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
-            backgroundColor: colorScheme.primary.withOpacity(0.9),
+            backgroundColor: colorScheme.primary.withValues(alpha: 0.9),
             elevation: 0,
             actions: [
               IconButton(
@@ -285,8 +285,8 @@ class _AyatPageState extends State<AyatPage>
                   end: Alignment.bottomCenter,
                   colors: [
                     colorScheme.primary,
-                    colorScheme.primary.withOpacity(0.8),
-                    colorScheme.primary.withOpacity(0.6),
+                    colorScheme.primary.withValues(alpha: 0.8),
+                    colorScheme.primary.withValues(alpha: 0.6),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -295,7 +295,7 @@ class _AyatPageState extends State<AyatPage>
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   ),
@@ -391,7 +391,7 @@ class _AyatPageState extends State<AyatPage>
                     color: colorScheme.surface,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 2),
                       ),
@@ -453,7 +453,7 @@ class _AyatPageState extends State<AyatPage>
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -503,14 +503,14 @@ class _AyatPageState extends State<AyatPage>
       decoration: BoxDecoration(
         color:
             isEnabled
-                ? colorScheme.primary.withOpacity(0.9)
-                : colorScheme.primary.withOpacity(0.4),
+                ? colorScheme.primary.withValues(alpha: 0.9)
+                : colorScheme.primary.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(15),
         boxShadow:
             isEnabled
                 ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -566,7 +566,7 @@ class _AyatPageState extends State<AyatPage>
                   Text(
                     'Ayat 1-${targetSurah.verseCount}',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 12,
                     ),
                   ),
@@ -595,7 +595,7 @@ class _AyatPageState extends State<AyatPage>
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -633,7 +633,7 @@ class _AyatPageState extends State<AyatPage>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: colorScheme.onSurface.withOpacity(0.8),
+                        color: colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
                     ),
 
@@ -647,8 +647,8 @@ class _AyatPageState extends State<AyatPage>
                             Navigator.pop(context);
                           },
                           style: TextButton.styleFrom(
-                            foregroundColor: colorScheme.onSurface.withOpacity(
-                              0.7,
+                            foregroundColor: colorScheme.onSurface.withValues(
+                              alpha: 0.7,
                             ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,

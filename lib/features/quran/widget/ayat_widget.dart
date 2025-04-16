@@ -124,7 +124,7 @@ class _AyatWidgetState extends State<AyatWidget> {
                                             widget.bookmarkModel!.ayatNumber ==
                                                 widget.verse.verseNumber)
                                         ? colorScheme.primary
-                                        : Colors.grey.withOpacity(0.5),
+                                        : Colors.grey.withValues(alpha: 0.5),
                                 size: 28,
                               ),
                             )
@@ -186,7 +186,9 @@ class _AyatWidgetState extends State<AyatWidget> {
                                     : TextAlign.left,
                             style: TextStyle(
                               fontSize: 16,
-                              color: colorScheme.onBackground.withOpacity(0.8),
+                              color: colorScheme.onBackground.withValues(
+                                alpha: 0.8,
+                              ),
                               height: 1.5,
                               letterSpacing: 0.3,
                             ),

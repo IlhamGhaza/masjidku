@@ -185,14 +185,17 @@ class _QuranPageState extends State<QuranPage>
         height: 160,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [colorScheme.primary, colorScheme.primary.withOpacity(0.8)],
+            colors: [
+              colorScheme.primary,
+              colorScheme.primary.withValues(alpha: 0.8),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withOpacity(0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -225,7 +228,7 @@ class _QuranPageState extends State<QuranPage>
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -243,7 +246,7 @@ class _QuranPageState extends State<QuranPage>
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -281,9 +284,9 @@ class _QuranPageState extends State<QuranPage>
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
-                        color: Colors.white.withOpacity(0.15),
+                        color: Colors.white.withValues(alpha: 0.15),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 1,
                         ),
                       ),
@@ -357,7 +360,7 @@ class _QuranPageState extends State<QuranPage>
               color: colorScheme.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -381,7 +384,7 @@ class _QuranPageState extends State<QuranPage>
                       'disimpan 3 hari yang lalu',
                       style: TextStyle(
                         fontSize: 10,
-                        color: colorScheme.onBackground.withOpacity(0.6),
+                        color: colorScheme.onBackground.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -402,7 +405,7 @@ class _QuranPageState extends State<QuranPage>
                   "Dengan nama Allah Yang Maha Pengasih, Maha Penyayang",
                   style: TextStyle(
                     fontSize: 14,
-                    color: colorScheme.onBackground.withOpacity(0.8),
+                    color: colorScheme.onBackground.withValues(alpha: 0.8),
                   ),
                 ),
                 const Spacer(),
@@ -480,7 +483,7 @@ class _QuranPageState extends State<QuranPage>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: colorScheme.primary.withOpacity(0.1),
+          color: colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -510,7 +513,7 @@ class _QuranPageState extends State<QuranPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -539,7 +542,7 @@ class _QuranPageState extends State<QuranPage>
                     gradient: LinearGradient(
                       colors: [
                         colorScheme.primary,
-                        colorScheme.primary.withOpacity(0.7),
+                        colorScheme.primary.withValues(alpha: 0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -547,7 +550,7 @@ class _QuranPageState extends State<QuranPage>
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.2),
+                        color: colorScheme.primary.withValues(alpha: 0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -582,7 +585,7 @@ class _QuranPageState extends State<QuranPage>
                       Text(
                         '${surah.meaning} • ${surah.verseCount} Ayat',
                         style: TextStyle(
-                          color: colorScheme.onSurface.withOpacity(0.7),
+                          color: colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -597,7 +600,7 @@ class _QuranPageState extends State<QuranPage>
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
