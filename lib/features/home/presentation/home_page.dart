@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
+import 'package:intl/number_symbols_data.dart';
 import 'package:quran_flutter/quran_flutter.dart';
 import 'dart:ui';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../core/utils/permisson_utils.dart';
 import '../../../core/utils/prayertimeinfo.dart';
 import '../../../data/datasource/db_local_datasource.dart';
 import '../../event/announcement_page.dart';
@@ -73,33 +75,6 @@ class _HomePageState extends State<HomePage> {
   ];
 
   late final Color _selectedColor;
-
-  @override
-  void initState() {
-    super.initState();
-    // Pilih warna secara acak saat widget diinisialisasi
-    final random = Random();
-    _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
-    isloading = true;
-    now = DateFormat('dd MMMM yyyy').format(DateTime.now());
-    // _calculatePrayerTimes();
-    
-    // Verse verse = Quran.getVerse(surahNumber: 1, verseNumber: 5);
-    // print(verse.text);
-  }
-
-  String locationNow = 'Kabupaten Bogor, Jawa Barat, Indonesia';
-  PrayerTimes? prayerTimes;
-  String nextPrayerName = 'Tidak diketahui';
-
-  String? nextPrayerTime;
-  Duration countdownDuration = Duration.zero;
-  // Timer? countdownTimer;
-  String? now;
-  Verse? lastVerseRead;
-  Verse? lastVerseReadTranslate;
-
-  bool isloading = true;
   var myCoordinates = Coordinates(-6.537132990026773, 106.79284326451504);
   final params = CalculationMethod.singapore.getParameters();
   String? imsak;
@@ -109,116 +84,220 @@ class _HomePageState extends State<HomePage> {
   String? asr;
   String? maghrib;
   String? isha;
-  String currentPrayerName = 'Tidak diketahui';
 
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    return "${twoDigits(duration.inHours)}:${twoDigits(duration.inMinutes.remainder(60))}:${twoDigits(duration.inSeconds.remainder(60))}";
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    final random = Random();
+    _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
+    loadLocation().then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+
+    params.madhab = Madhab.shafi;
   }
 
-  void _calculatePrayerTimes() async {
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void calculatePrayerTimes(DateTime date) {
     setState(() {
-      isloading = true;
+      _isLoading = true;
+    });
+
+    DateComponents dateComponents = DateComponents(
+      date.year,
+      date.month,
+      date.day,
+    );
+    final prayerTimes = PrayerTimes(myCoordinates, dateComponents, params);
+
+    setState(() {
+      imsak = DateFormat.jm().format(
+        prayerTimes.fajr.subtract(Duration(minutes: 10)),
+      );
+      fajr = DateFormat.jm().format(prayerTimes.fajr);
+      sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+      dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+      asr = DateFormat.jm().format(prayerTimes.asr);
+      maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+      isha = DateFormat.jm().format(prayerTimes.isha);
+      selectedDate = date;
+      _isLoading = false;
+    });
+  }
+
+  void onChangeDate(int days) {
+    DateTime newDate = selectedDate.add(Duration(days: days));
+    calculatePrayerTimes(newDate);
+  }
+
+  refreshLocation() async {
+    setState(() {
+      _isLoading = true;
     });
 
     try {
-      List latLng = await DbLocalDatasource().getLatLng();
-      double? lat;
-      double? lng;
+      final permissionStatus = await requestLocationPermission();
+      if (permissionStatus) {
+        final location = await determinePosition();
+        myCoordinates = Coordinates(location.latitude, location.longitude);
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+          location.latitude,
+          location.longitude,
+        );
 
-      if (latLng.isNotEmpty) {
-        lat = latLng[0];
-        lng = latLng[1];
-      } else {
-        // Default coordinates if none are available
-        lat = -7.797068;
-        lng = 110.370529;
-      }
+        if (placemarks.isNotEmpty) {
+          Placemark place = placemarks[0];
+          locationNow = "${place.subAdministrativeArea}, ${place.country}";
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
 
-      // Lokasi (ganti dengan koordinat lokasi pengguna)
-      myCoordinates = Coordinates(lat!, lng!);
-      final params = CalculationMethod.singapore.getParameters();
-      params.madhab = Madhab.shafi;
-
-      final date = DateComponents.from(DateTime.now());
-      final prayerTimes = PrayerTimes(myCoordinates, date, params);
-
-      // Get prayer times
-      String imsak = DateFormat.jm().format(
-        prayerTimes.fajr.subtract(Duration(minutes: 10)),
-      );
-      String fajr = DateFormat.jm().format(prayerTimes.fajr);
-      String sunrise = DateFormat.jm().format(prayerTimes.sunrise);
-      String dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
-      String asr = DateFormat.jm().format(prayerTimes.asr);
-      String maghrib = DateFormat.jm().format(prayerTimes.maghrib);
-      String isha = DateFormat.jm().format(prayerTimes.isha);
-
-      // Get the next prayer info using PrayerTimeUtils
-      final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
-        imsak: imsak,
-        fajr: fajr,
-        sunrise: sunrise,
-        dhuhr: dhuhr,
-        asr: asr,
-        maghrib: maghrib,
-        isha: isha,
-      );
-
-      // Get current prayer
-      var currentPrayer = PrayerTimeUtils.getCurrentPrayer(
-        imsak: imsak,
-        fajr: fajr,
-        sunrise: sunrise,
-        dhuhr: dhuhr,
-        asr: asr,
-        maghrib: maghrib,
-        isha: isha,
-      );
-
-      // Set default location in case geocoding fails
-      String location = "${lat.toStringAsFixed(2)}, ${lng.toStringAsFixed(2)}";
-
-      try {
-        if (GeocodingPlatform.instance != null) {
-          List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-          if (placemarks.isNotEmpty) {
-            Placemark place = placemarks[0];
-            if (place.subAdministrativeArea != null && place.country != null) {
-              location = "${place.subAdministrativeArea}, ${place.country}";
-            }
-          }
+          imsak = DateFormat.jm().format(
+            prayerTimes.fajr.subtract(Duration(minutes: 10)),
+          );
+          fajr = DateFormat.jm().format(prayerTimes.fajr);
+          sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+          dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+          asr = DateFormat.jm().format(prayerTimes.asr);
+          maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+          isha = DateFormat.jm().format(prayerTimes.isha);
+          setState(() {
+            _isLoading = false;
+          });
         }
-      } catch (e) {
-        print("Error getting location name: $e");
-        // Keep using the default location string
+        await DbLocalDatasource().saveLatLng(
+          location.latitude,
+          location.longitude,
+        );
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        // Show snackbar when permission is denied
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.tr('location permission denied')),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
       }
-
-      setState(() {
-        locationNow = location;
-        nextPrayerName = nextPrayerInfo.name;
-        nextPrayerTime = DateFormat.jm().format(nextPrayerInfo.time);
-        countdownDuration = nextPrayerInfo.time.difference(DateTime.now());
-        currentPrayer = currentPrayer;
-
-        // Store all prayer times for display
-        this.fajr = fajr;
-        this.sunrise = sunrise;
-        this.dhuhr = dhuhr;
-        this.asr = asr;
-        this.maghrib = maghrib;
-        this.isha = isha;
-        this.imsak = imsak;
-
-        isloading = false;
-      });
     } catch (e) {
-      print("Error calculating prayer times: $e");
       setState(() {
-        isloading = false;
+        _isLoading = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
     }
   }
+
+  Future<void> loadLocation() async {
+    try {
+      final permissionStatus = await requestLocationPermission();
+      final latLng = await DbLocalDatasource().getLatLng();
+
+      if (latLng.isEmpty) {
+        if (permissionStatus) {
+          await refreshLocation();
+        } else {
+          // Show snackbar when permission is denied
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  context.tr('location permission denied, please enable it'),
+                  style: const TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+          }
+          // Use default coordinates
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
+          updatePrayerTimes(prayerTimes);
+        }
+      } else {
+        double lat = latLng[0];
+        double lng = latLng[1];
+        try {
+          List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+          if (placemarks.isNotEmpty) {
+            myCoordinates = Coordinates(lat, lng);
+            Placemark place = placemarks[0];
+            locationNow = "${place.subAdministrativeArea}, ${place.country}";
+            final prayerTimes = PrayerTimes.today(myCoordinates, params);
+            updatePrayerTimes(prayerTimes);
+          }
+        } catch (e) {
+          // If geocoding fails, still calculate prayer times with saved coordinates
+          myCoordinates = Coordinates(lat, lng);
+          final prayerTimes = PrayerTimes.today(myCoordinates, params);
+          updatePrayerTimes(prayerTimes);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  void updatePrayerTimes(PrayerTimes prayerTimes) {
+    setState(() {
+      imsak = DateFormat.jm().format(
+        prayerTimes.fajr.subtract(Duration(minutes: 10)),
+      );
+      fajr = DateFormat.jm().format(prayerTimes.fajr);
+      sunrise = DateFormat.jm().format(prayerTimes.sunrise);
+      dhuhr = DateFormat.jm().format(prayerTimes.dhuhr);
+      asr = DateFormat.jm().format(prayerTimes.asr);
+      maghrib = DateFormat.jm().format(prayerTimes.maghrib);
+      isha = DateFormat.jm().format(prayerTimes.isha);
+      _isLoading = false;
+    });
+  }
+
+  DateTime selectedDate = DateTime.now();
+  String locationNow = 'Kab Bogor, Indonesia';
 
   @override
   Widget build(BuildContext context) {
@@ -355,7 +434,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             fit: BoxFit.cover,
                             colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(0.3),
+                              Colors.black.withValues(alpha: 0.3),
                               BlendMode.darken,
                             ),
                           ),
@@ -374,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -404,7 +483,7 @@ class _HomePageState extends State<HomePage> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -445,7 +524,9 @@ class _HomePageState extends State<HomePage> {
                                     vertical: 4,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: colorScheme.primary.withOpacity(0.4),
+                                    color: colorScheme.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -458,7 +539,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        '$currentPrayerName: ',
+                                        'Current Prayer: ',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -466,19 +547,15 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       Text(
-                                        currentPrayerName == 'Shubuh'
-                                            ? fajr ?? '05:00'
-                                            : currentPrayerName == 'Terbit'
-                                            ? sunrise ?? '06:15'
-                                            : currentPrayerName == 'Zuhur'
-                                            ? dhuhr ?? '12:00'
-                                            : currentPrayerName == 'Ashar'
-                                            ? asr ?? '15:30'
-                                            : currentPrayerName == 'Maghrib'
-                                            ? maghrib ?? '18:15'
-                                            : currentPrayerName == 'Isya'
-                                            ? isha ?? '19:30'
-                                            : '00:00',
+                                        PrayerTimeUtils.getCurrentPrayer(
+                                          imsak: imsak,
+                                          fajr: fajr,
+                                          sunrise: sunrise,
+                                          dhuhr: dhuhr,
+                                          asr: asr,
+                                          maghrib: maghrib,
+                                          isha: isha,
+                                        ),
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
@@ -509,39 +586,7 @@ class _HomePageState extends State<HomePage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     // Time to next prayer
-                                    Row(
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          Icons.timer_outlined,
-                                          color: Colors.white,
-                                          size: 18,
-                                        ),
-                                        Text(
-                                          _formatDuration(countdownDuration),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          'to',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        Text(
-                                          nextPrayerName,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                    _nextPrayer(),
                                     // See all button
                                     ElevatedButton(
                                       onPressed: () {
@@ -583,7 +628,9 @@ class _HomePageState extends State<HomePage> {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.successColor.withOpacity(0.8),
+                                  color: AppTheme.successColor.withValues(
+                                    alpha: 0.8,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -834,7 +881,7 @@ class _HomePageState extends State<HomePage> {
                       }),
                       //announcement section
                       SizedBox(
-                        height: 173,
+                        height: 175,
                         child: ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -940,7 +987,7 @@ class _HomePageState extends State<HomePage> {
                       }),
                       //event section
                       SizedBox(
-                        height: 173,
+                        height: 175,
                         child: ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -1161,6 +1208,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _nextPrayer() {
+    final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
+      imsak: imsak,
+      fajr: fajr,
+      sunrise: sunrise,
+      dhuhr: dhuhr,
+      asr: asr,
+      maghrib: maghrib,
+      isha: isha,
+    );
+
+    final nextPrayer = nextPrayerInfo.name;
+    final nextTime = DateFormat.jm().format(nextPrayerInfo.time);
+    final timeRemaining = nextPrayerInfo.timeRemaining;
+    return Row(
+      spacing: 4,
+      children: [
+        Icon(Icons.timer_outlined, color: Colors.white, size: 18),
+        Text(
+          "$nextPrayer: $nextTime",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text('to', style: TextStyle(color: Colors.white, fontSize: 16)),
+        Text(
+          timeRemaining,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _gridIcon() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1309,14 +1395,14 @@ class _HomePageState extends State<HomePage> {
           height: 45,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             border: Border.all(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 spreadRadius: 1,
               ),
@@ -1341,8 +1427,11 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            color: Colors.white.withOpacity(0.15),
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            color: Colors.white.withValues(alpha: 0.15),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1353,7 +1442,7 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     context.tr('today'),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -1374,7 +1463,7 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     context.tr('hijri'),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
