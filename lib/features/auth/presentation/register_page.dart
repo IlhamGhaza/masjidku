@@ -3,24 +3,29 @@ import 'package:flutter/material.dart';
 import '../widget/auth_button.dart';
 import '../widget/auth_text_field.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _nameController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -30,9 +35,15 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _handleLogin() {
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _obscureConfirmPassword = !_obscureConfirmPassword;
+    });
+  }
+
+  void _handleRegister() {
     if (_formKey.currentState?.validate() ?? false) {
-      // TODO: Implement login logic
+      // Form is valid, handle registration
       setState(() {
         _isLoading = true;
       });
@@ -42,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _isLoading = false;
         });
-        // Navigate to home or show error
+        // Navigate to home or show success
       });
     }
   }
@@ -53,6 +64,14 @@ class _LoginPageState extends State<LoginPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onBackground),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -62,8 +81,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 40),
-                  // Logo and Header
+                  // Header
                   Center(
                     child: Column(
                       children: [
@@ -75,14 +93,14 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Icon(
-                            Icons.mosque_rounded,
+                            Icons.person_add_rounded,
                             size: 48,
                             color: theme.colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Selamat Datang',
+                          'Daftar Akun',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onBackground,
@@ -90,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Masuk untuk melanjutkan ke Masjidku',
+                          'Buat akun baru untuk menggunakan Masjidku',
                           style: theme.textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -98,26 +116,42 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 40),
 
-                  // Email Field
+                  // Name Field
                   AuthTextField(
-                    label: 'Email',
-                    hint: 'Masukkan email anda',
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    label: 'Nama Lengkap',
+                    hint: 'Masukkan nama lengkap anda',
+                    controller: _nameController,
                     prefixIcon: Icon(
-                      Icons.email_outlined,
+                      Icons.person_outline,
                       color: theme.colorScheme.primary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email tidak boleh kosong';
+                        return 'Nama tidak boleh kosong';
                       }
-                      if (!RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      ).hasMatch(value)) {
-                        return 'Masukkan email yang valid';
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Username Field
+                  AuthTextField(
+                    label: 'Username',
+                    hint: 'Masukkan username anda',
+                    controller: _usernameController,
+                    prefixIcon: Icon(
+                      Icons.alternate_email,
+                      color: theme.colorScheme.primary,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Username tidak boleh kosong';
+                      }
+                      if (value.length < 4) {
+                        return 'Username minimal 4 karakter';
                       }
                       return null;
                     },
@@ -155,57 +189,70 @@ class _LoginPageState extends State<LoginPage> {
                     },
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
 
-                  // Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // TODO: Navigate to forgot password
-                      },
-                      child: Text(
-                        'Lupa Password?',
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  // Confirm Password Field
+                  AuthTextField(
+                    label: 'Konfirmasi Password',
+                    hint: 'Masukkan ulang password anda',
+                    controller: _confirmPasswordController,
+                    obscureText: _obscureConfirmPassword,
+                    prefixIcon: Icon(
+                      Icons.lock_outline,
+                      color: theme.colorScheme.primary,
                     ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: theme.colorScheme.primary,
+                      ),
+                      onPressed: _toggleConfirmPasswordVisibility,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Konfirmasi password tidak boleh kosong';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Password tidak sama';
+                      }
+                      return null;
+                    },
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
 
-                  // Login Button
+                  // Register Button
                   AuthButton(
-                    text: 'Masuk',
-                    onPressed: _handleLogin,
+                    text: 'Daftar',
+                    onPressed: _handleRegister,
                     isLoading: _isLoading,
                   ),
 
                   const SizedBox(height: 24),
 
-                  // Divider
+                  // Login Link
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(child: Divider(color: theme.dividerTheme.color)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('Atau', style: theme.textTheme.bodyMedium),
+                      Text(
+                        'Sudah punya akun?',
+                        style: theme.textTheme.bodyMedium,
                       ),
-                      Expanded(child: Divider(color: theme.dividerTheme.color)),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Masuk',
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Register Button
-                  AuthButton(
-                    text: 'Daftar Akun Baru',
-                    onPressed: () {
-                      // TODO: Navigate to register page
-                    },
-                    isOutlined: true,
                   ),
                 ],
               ),

@@ -441,7 +441,8 @@ class _UpcomingEventPageState extends State<UpcomingEventPage> {
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Registered for ${event.title}'),
+                              backgroundColor: Colors.green,
+                              content: Text('Registered for ${event.title}', style: TextStyle(color: Colors.white)),
                             ),
                           );
                         },

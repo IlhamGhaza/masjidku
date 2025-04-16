@@ -820,21 +820,6 @@ class _PrayerPageState extends State<PrayerPage>
     }
   }
 
-  // bool _isNextPrayer(String prayerName) {
-  //   // Logic to determine if this is the next prayer time
-  //   // This is a placeholder - you would implement actual logic based on current time
-  //   DateTime now = DateTime.now();
-
-  //   // Example implementation (simplified)
-  //   if (prayerName == 'Shubuh' && now.hour < 5) return true;
-  //   if (prayerName == 'Zuhur' && now.hour >= 5 && now.hour < 12) return true;
-  //   if (prayerName == 'Ashar' && now.hour >= 12 && now.hour < 15) return true;
-  //   if (prayerName == 'Maghrib' && now.hour >= 15 && now.hour < 18) return true;
-  //   if (prayerName == 'Isya' && now.hour >= 18) return true;
-
-  //   return false;
-  // }
-
   void _showSetAlarmDialog(
     BuildContext context,
     String prayerName,

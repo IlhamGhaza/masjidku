@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:masjidku/features/quran/presentation/hadit_page.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/event/upcoming_event_page.dart';
@@ -23,7 +24,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
     const HomePage(),
     const QuranPage(),
     const FinanceReportPage(),
-    const UpcomingEventPage(), 
+    const HadithPage(), 
     const ProfilePage(),
   ];
 
@@ -133,7 +134,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                             selectedIcon: const Icon(
                               Icons.calendar_today_rounded,
                             ),
-                            label: Text('event'.tr()),
+                            label: Text('hadith'.tr()),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.person_outline_rounded),
@@ -243,6 +244,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                       ),
                       NavigationDestination(
                         icon: Icon(
+                          //hadith
                           Icons.calendar_today_outlined,
                           color:
                               _selectedIndex == 3
@@ -253,7 +255,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.calendar_today_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'event'.tr(),
+                        label: 'hadith'.tr(),
                       ),
                       NavigationDestination(
                         icon: Icon(

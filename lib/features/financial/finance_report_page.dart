@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
+import '../../data/model/financial_data.dart';
+import '../../data/model/transaction.dart';
 
 class FinanceReportPage extends StatefulWidget {
   const FinanceReportPage({super.key});
@@ -16,14 +19,14 @@ class FinanceReportPage extends StatefulWidget {
 
 class _FinanceReportPageState extends State<FinanceReportPage> {
   String _selectedPeriod = 'M'; // Default to Monthly
-  
+
   // Sample financial data
   final Map<String, double> _financialData = {
     'income': 25000000,
     'expense': 18500000,
     'balance': 6500000,
   };
-  
+
   // Sample recent transactions
   final List<Transaction> _recentTransactions = [
     Transaction(
@@ -74,7 +77,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
         final screenSize = MediaQuery.of(context).size;
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Finance Report'),
+            title: Text(context.tr('Finance_Report')),
             backgroundColor: colorScheme.primary,
             centerTitle: true,
             elevation: 0,
@@ -122,16 +125,13 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
     );
   }
 
-  Widget _buildFinancialHeader(
-    ColorScheme colorScheme,
-    Size screenSize,
-  ) {
+  Widget _buildFinancialHeader(ColorScheme colorScheme, Size screenSize) {
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
       decimalDigits: 0,
     );
-    
+
     return Container(
       color: colorScheme.background,
       child: Column(
@@ -169,98 +169,107 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Current Balance',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 600.ms)
-                    .slideY(
-                      begin: -0.2,
-                      end: 0,
-                      duration: 600.ms,
-                      curve: Curves.easeOutQuart,
-                    ),
+                          context.tr('Current_Balance'),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(
+                          begin: -0.2,
+                          end: 0,
+                          duration: 600.ms,
+                          curve: Curves.easeOutQuart,
+                        ),
                     const SizedBox(height: 8),
                     Text(
-                      currencyFormat.format(_financialData['balance']),
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    )
-                    .animate()
-                    .fadeIn(duration: 600.ms, delay: 200.ms)
-                    .slideY(
-                      begin: -0.2,
-                      end: 0,
-                      duration: 600.ms,
-                      delay: 200.ms,
-                      curve: Curves.easeOutQuart,
-                    ),
+                          currencyFormat.format(_financialData['balance']),
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        )
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 200.ms)
+                        .slideY(
+                          begin: -0.2,
+                          end: 0,
+                          duration: 600.ms,
+                          delay: 200.ms,
+                          curve: Curves.easeOutQuart,
+                        ),
                     const SizedBox(height: 24),
                     _buildFinancialSummary(colorScheme)
-                    .animate()
-                    .fadeIn(duration: 600.ms, delay: 400.ms)
-                    .slideY(
-                      begin: 0.2,
-                      end: 0,
-                      duration: 600.ms,
-                      delay: 400.ms,
-                      curve: Curves.easeOutQuart,
-                    ),
+                        .animate()
+                        .fadeIn(duration: 600.ms, delay: 400.ms)
+                        .slideY(
+                          begin: 0.2,
+                          end: 0,
+                          duration: 600.ms,
+                          delay: 400.ms,
+                          curve: Curves.easeOutQuart,
+                        ),
                   ],
                 ),
               ),
             ),
           ),
-          
+
           // Period selector
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Income vs Expense',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onBackground,
-                  ),
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Income_vs_Expense',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onBackground,
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          _buildPeriodButton(
+                            'W'.tr(),
+                            'Weekly'.tr(),
+                            colorScheme,
+                          ),
+                          _buildPeriodButton(
+                            'M'.tr(),
+                            'Monthly'.tr(),
+                            colorScheme,
+                          ),
+                          _buildPeriodButton(
+                            'Y'.tr(),
+                            'Yearly'.tr(),
+                            colorScheme,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      _buildPeriodButton('W', 'Weekly', colorScheme),
-                      _buildPeriodButton('M', 'Monthly', colorScheme),
-                      _buildPeriodButton('Y', 'Yearly', colorScheme),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
-          .animate()
-          .fadeIn(duration: 800.ms, delay: 600.ms)
-          .slideX(
-            begin: 0.2,
-            end: 0,
-            duration: 800.ms,
-            delay: 600.ms,
-          ),
-          
+              )
+              .animate()
+              .fadeIn(duration: 800.ms, delay: 600.ms)
+              .slideX(begin: 0.2, end: 0, duration: 800.ms, delay: 600.ms),
+
           // Chart placeholder
-          
+
           // Container(
           //   width: double.infinity,
           //   height: 200,
@@ -344,6 +353,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ),
     );
   }
+
   Widget _buildFinancialChart(ColorScheme colorScheme) {
     // Sample data for the chart
     final List<FinancialData> chartData = [
@@ -377,7 +387,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ),
       series: <CartesianSeries>[
         ColumnSeries<FinancialData, String>(
-          name: 'Income',
+          name: 'Income'.tr(),
           dataSource: chartData,
           xValueMapper: (FinancialData data, _) => data.month,
           yValueMapper: (FinancialData data, _) => data.income,
@@ -391,7 +401,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
           spacing: 0.2,
         ),
         ColumnSeries<FinancialData, String>(
-          name: 'Expense',
+          name: 'Expense'.tr(),
           dataSource: chartData,
           xValueMapper: (FinancialData data, _) => data.month,
           yValueMapper: (FinancialData data, _) => data.expense,
@@ -407,10 +417,14 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ],
     );
   }
-  
-  Widget _buildPeriodButton(String value, String tooltip, ColorScheme colorScheme) {
+
+  Widget _buildPeriodButton(
+    String value,
+    String tooltip,
+    ColorScheme colorScheme,
+  ) {
     final isSelected = _selectedPeriod == value;
-    
+
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -437,19 +451,19 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ),
     );
   }
-  
+
   Widget _buildFinancialSummary(ColorScheme colorScheme) {
     final currencyFormat = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
       decimalDigits: 0,
     );
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildSummaryItem(
-          'Income',
+          'Income'.tr(),
           currencyFormat.format(_financialData['income']),
           Icons.arrow_upward,
           Colors.green,
@@ -461,7 +475,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
           color: Colors.white.withValues(alpha: 0.3),
         ),
         _buildSummaryItem(
-          'Expense',
+          'Expense'.tr(),
           currencyFormat.format(_financialData['expense']),
           Icons.arrow_downward,
           Colors.red,
@@ -470,7 +484,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ],
     );
   }
-  
+
   Widget _buildSummaryItem(
     String title,
     String amount,
@@ -482,18 +496,11 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       children: [
         Row(
           children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 16,
-            ),
+            Icon(icon, color: iconColor, size: 16),
             const SizedBox(width: 4),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.white,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.white),
             ),
           ],
         ),
@@ -509,13 +516,13 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ],
     );
   }
-  
+
   Widget _buildSummarySection(ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Summary',
+          context.tr('Summary'),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -527,7 +534,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
           children: [
             Expanded(
               child: _buildSummaryCard(
-                'Total Income',
+                'Total_Income'.tr(),
                 'Rp 25,000,000',
                 Icons.arrow_circle_up,
                 Colors.green,
@@ -537,7 +544,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
             const SizedBox(width: 16),
             Expanded(
               child: _buildSummaryCard(
-                'Total Expense',
+                'Total_Expense'.tr(),
                 'Rp 18,500,000',
                 Icons.arrow_circle_down,
                 Colors.red,
@@ -549,7 +556,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
       ],
     );
   }
-  
+
   Widget _buildSummaryCard(
     String title,
     String amount,
@@ -575,11 +582,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 20,
-              ),
+              Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 title,
@@ -612,7 +615,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent Transactions',
+              context.tr('Recent_Transaction'),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -624,7 +627,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
                 // Navigate to all transactions
               },
               child: Text(
-                'View All',
+                context.tr('see_all'),
                 style: TextStyle(
                   color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -663,7 +666,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No transactions yet',
+            context.tr('no_transactions'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -671,11 +674,13 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Add your first transaction by tapping the + button',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: colorScheme.onBackground.withValues(alpha: 0.6)),
-          ),
+          // Text(
+          //   'Add your first transaction by tapping the + button',
+          //   textAlign: TextAlign.center,
+          //   style: TextStyle(
+          //     color: colorScheme.onBackground.withValues(alpha: 0.6),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -782,27 +787,4 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
         return Icons.attach_money;
     }
   }
-}
-
-class Transaction {
-  final String title;
-  final double amount;
-  final DateTime date;
-  final bool isIncome;
-  final String category;
-
-  Transaction({
-    required this.title,
-    required this.amount,
-    required this.date,
-    required this.isIncome,
-    required this.category,
-  });
-}
-class FinancialData {
-  final String month;
-  final double income;
-  final double expense;
-
-  FinancialData(this.month, this.income, this.expense);
 }

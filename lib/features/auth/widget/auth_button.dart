@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:masjidku/core/theme/theme.dart';
+
+class AuthButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final bool isLoading;
+  final bool isOutlined;
+
+  const AuthButton({
+    Key? key,
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+    this.isOutlined = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isOutlined ? Colors.transparent : null,
+          foregroundColor: isOutlined ? theme.colorScheme.primary : null,
+          elevation: isOutlined ? 0 : null,
+          side:
+              isOutlined ? BorderSide(color: theme.colorScheme.primary) : null,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ).copyWith(
+          backgroundColor:
+              isOutlined
+                  ? MaterialStateProperty.all(Colors.transparent)
+                  : MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialStateProperty.resolveWith)) {
+                      return Colors.transparent;
+                    }
+                    return null;
+                  }),
+        ),
+        child:
+            isLoading
+                ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      isOutlined ? theme.colorScheme.primary : Colors.white,
+                    ),
+                  ),
+                )
+                : Container(
+                  decoration:
+                      isOutlined
+                          ? null
+                          : BoxDecoration(
+                            gradient:
+                                isDark
+                                    ? AppTheme.darkButtonGradient
+                                    : AppTheme.lightButtonGradient,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                  child: Center(
+                    child: Text(
+                      text,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color:
+                            isOutlined
+                                ? theme.colorScheme.primary
+                                : Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+      ),
+    );
+  }
+}
