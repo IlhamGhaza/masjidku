@@ -20,15 +20,8 @@ void main() async {
   );
   await EasyLocalization.ensureInitialized();
   await Quran.initialize();
-  runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('id'), Locale('en')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('id'),
+   runApp(const MyApp());
 
-      child: const MyApp(),
-    ),
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,26 +29,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => ThemeCubit()),
-        BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
-      ],
-      child: BlocBuilder<ThemeCubit, ThemeMode>(
-        builder: (context, themeMode) {
-          return MaterialApp(
-            title: 'MasjidKu',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeMode,
-            //localization
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            home: const SplashPage(),
-          );
-        },
+    return EasyLocalization(
+      supportedLocales: const [Locale('id'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('id'),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => ThemeCubit()),
+          BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
+        ],
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp(
+              title: 'MasjidKu',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              localizationsDelegates: context.localizationDelegates,
+              supportedLocales: context.supportedLocales,
+              locale: context.locale,
+              home: const SplashPage(),
+            );
+          },
+        ),
       ),
     );
   }

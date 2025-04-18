@@ -20,7 +20,6 @@ class SeeAllWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             text,
@@ -30,7 +29,7 @@ class SeeAllWidget extends StatelessWidget {
               color: colorScheme.onBackground,
             ),
           ),
-          const SizedBox(width: 8.0),
+          const Spacer(),
           InkWell(
             onTap: onTap,
             child: Text(

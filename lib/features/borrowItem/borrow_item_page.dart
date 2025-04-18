@@ -49,8 +49,8 @@ class _BorrowItemsPageState extends State<BorrowItemsPage>
               controller: _tabController,
               indicatorColor: colorScheme.onPrimary,
               labelColor: colorScheme.onPrimary, // Warna teks tab aktif
-              unselectedLabelColor: colorScheme.onPrimary.withOpacity(
-                0.7,
+              unselectedLabelColor: colorScheme.onPrimary.withValues(
+                alpha: 0.7,
               ), // Warna teks tab tidak aktif
               labelStyle: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -137,7 +137,7 @@ class _BorrowItemsPageState extends State<BorrowItemsPage>
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(color: colorScheme.onSurface.withOpacity(0.7)),
+          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         trailing: ElevatedButton(
           onPressed: onTap,
