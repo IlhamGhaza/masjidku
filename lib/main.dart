@@ -7,9 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'core/theme/language_cubit.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
-import 'features/splash_page.dart';
+import 'features/auth/presentation/splash_page.dart';
 import 'package:quran_flutter/quran_flutter.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,13 +25,8 @@ void main() async {
       supportedLocales: const [Locale('id'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('id'),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()),
-          BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
-        ],
-        child: const MyApp(),
-      ),
+
+      child: const MyApp(),
     ),
   );
 }
@@ -42,8 +36,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeCubit(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp(

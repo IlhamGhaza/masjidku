@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../core/theme/theme.dart';
-import '../nav_bar.dart';
+import '../../../core/theme/theme.dart';
+import '../../../nav_bar.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});

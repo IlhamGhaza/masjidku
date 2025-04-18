@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
-import 'package:intl/number_symbols_data.dart';
-import 'package:quran_flutter/quran_flutter.dart';
+
 import 'dart:ui';
 
 import '../../../core/theme/theme.dart';
@@ -15,11 +14,14 @@ import '../../../core/theme/theme_cubit.dart';
 import '../../../core/utils/permisson_utils.dart';
 import '../../../core/utils/prayertimeinfo.dart';
 import '../../../data/datasource/db_local_datasource.dart';
-import '../../event/announcement_page.dart';
 import '../../event/upcoming_event_page.dart';
 import '../../prayer/prayer_page.dart';
 import '../../account/presentation/profile_page.dart';
+import '../widget/glassmorphic_icon_widget.dart';
+import '../widget/grid_icon_widget.dart';
 import '../widget/icon_home_widget.dart';
+import '../widget/next_prayer_widget.dart';
+import '../widget/see_all_widget.dart';
 import 'notification_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -367,18 +369,22 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               children: [
                                 //notification
-                                _buildGlassmorphicIcon(Icons.notifications, () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => NotificationPage(),
-                                    ),
-                                  );
-                                }),
+                                GlassmorphicIconWidget(
+                                  icon: Icons.notifications,
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) => NotificationPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
                                 const SizedBox(width: 8.0),
-                                _buildGlassmorphicIcon(
-                                  Icons.person,
-                                  () {
+                                 GlassmorphicIconWidget(
+                                  icon: Icons.notifications,
+                                  onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -386,15 +392,6 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     );
                                   },
-                                  // IconButton(
-                                  //   onPressed: () {},
-                                  //   icon: Icon(
-                                  //     isDarkMode
-                                  //         ? Icons.light_mode
-                                  //         : Icons.dark_mode,
-                                  //     color: colorScheme.onPrimary,
-                                  //   ),
-                                  // ),
                                 ),
                               ],
                             ),
@@ -586,7 +583,15 @@ class _HomePageState extends State<HomePage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     // Time to next prayer
-                                    _nextPrayer(),
+                                    NextPrayerWidget(
+                                      imsak: imsak.toString(),
+                                      fajr: fajr.toString(),
+                                      sunrise: sunrise.toString(),
+                                      dhuhr: dhuhr.toString(),
+                                      asr: asr.toString(),
+                                      maghrib: maghrib.toString(),
+                                      isha: isha.toString(),
+                                    ),
                                     // See all button
                                     ElevatedButton(
                                       onPressed: () {
@@ -657,228 +662,22 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                       ),
-
-                      // _seeAll(colorScheme, context, 'Today Prayer', () {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => PrayerPage()),
-                      //   );
-                      // }),
-                      // // prayer time,
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //   children: [
-                      //     for (var prayer in prayerTimes)
-                      //       GestureDetector(
-                      //         onTap: () {
-                      //           setState(() {
-                      //             // Reset all statuses
-                      //             for (var p in prayerTimes) {
-                      //               p['status'] = '';
-                      //             }
-                      //             // Set status for the tapped prayer
-                      //             prayer['status'] = 'Started';
-                      //           });
-                      //         },
-                      //         child: Container(
-                      //           width: 70,
-                      //           height: 120,
-                      //           padding: const EdgeInsets.symmetric(
-                      //             vertical: 8,
-                      //             horizontal: 4,
-                      //           ),
-                      //           decoration: BoxDecoration(
-                      //             color: colorScheme.surface,
-                      //             borderRadius: BorderRadius.circular(10),
-                      //             boxShadow: [
-                      //               BoxShadow(
-                      //                 color: Colors.black.withValues(alpha: 0.05),
-                      //                 blurRadius: 5,
-                      //                 spreadRadius: 1,
-                      //               ),
-                      //             ],
-                      //           ),
-                      //           child: Column(
-                      //             mainAxisAlignment: MainAxisAlignment.center,
-                      //             children: [
-                      //               Text(
-                      //                 prayer['name'],
-                      //                 style: TextStyle(
-                      //                   fontSize: 12,
-                      //                   color: colorScheme.onSurface.withValues(
-                      //                     alpha: 0.7,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //               const SizedBox(height: 4),
-                      //               Text(
-                      //                 prayer['time'],
-                      //                 style: TextStyle(
-                      //                   fontSize: 14,
-                      //                   fontWeight: FontWeight.bold,
-                      //                   color: colorScheme.onSurface,
-                      //                 ),
-                      //               ),
-                      //               if (prayer['status'].isNotEmpty)
-                      //                 Container(
-                      //                   margin: const EdgeInsets.only(top: 4),
-                      //                   padding: const EdgeInsets.symmetric(
-                      //                     horizontal: 6,
-                      //                     vertical: 2,
-                      //                   ),
-                      //                   decoration: BoxDecoration(
-                      //                     color: AppTheme.successColor.withValues(
-                      //                       alpha: 0.2,
-                      //                     ),
-                      //                     borderRadius: BorderRadius.circular(10),
-                      //                   ),
-                      //                   child: Text(
-                      //                     prayer['status'],
-                      //                     style: TextStyle(
-                      //                       fontSize: 10,
-                      //                       color: AppTheme.successColor,
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ),
-                      //   ],
-                      // ),
-                      // // next prayer
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      //   child: Container(
-                      //     height: 55,
-                      //     padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      //     decoration: BoxDecoration(
-                      //       borderRadius: BorderRadius.circular(10),
-                      //       color: colorScheme.secondary.withValues(alpha: 0.15),
-                      //     ),
-                      //     child: Row(
-                      //       spacing: 5,
-                      //       children: [
-                      //         Container(
-                      //           height: 30,
-                      //           width: 30,
-                      //           decoration: BoxDecoration(
-                      //             color: colorScheme.secondary.withValues(
-                      //               alpha: 0.2,
-                      //             ),
-                      //           ),
-                      //           child: Icon(
-                      //             Icons.access_time_filled,
-                      //             color: colorScheme.primary,
-                      //           ),
-                      //         ),
-                      //         Padding(
-                      //           padding: const EdgeInsets.symmetric(
-                      //             vertical: 6.0,
-                      //             horizontal: 8.0,
-                      //           ),
-                      //           child: Column(
-                      //             crossAxisAlignment: CrossAxisAlignment.start,
-                      //             children: [
-                      //               Row(
-                      //                 children: [
-                      //                   Text(
-                      //                     'Next Prayer : ',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white
-                      //                               : Colors.black,
-                      //                     ),
-                      //                   ),
-                      //                   Text(
-                      //                     'Fajr ',
-                      //                     style: TextStyle(
-                      //                       color: colorScheme.primary,
-                      //                     ),
-                      //                   ),
-                      //                   Text(
-                      //                     'in - ',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white
-                      //                               : Colors.black,
-                      //                     ),
-                      //                   ),
-                      //                   Text(
-                      //                     '20 min',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white
-                      //                               : Colors.black,
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //               Row(
-                      //                 spacing: 3,
-                      //                 children: [
-                      //                   Text(
-                      //                     '1:30 AM',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white.withValues(
-                      //                                 alpha: 0.5,
-                      //                               )
-                      //                               : Colors.black.withValues(
-                      //                                 alpha: 0.5,
-                      //                               ),
-                      //                     ),
-                      //                   ),
-                      //                   Text(
-                      //                     '| iqomah :',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white.withValues(
-                      //                                 alpha: 0.5,
-                      //                               )
-                      //                               : Colors.black.withValues(
-                      //                                 alpha: 0.5,
-                      //                               ),
-                      //                     ),
-                      //                   ),
-                      //                   Text(
-                      //                     '10:30 PM',
-                      //                     style: TextStyle(
-                      //                       color:
-                      //                           isDarkMode
-                      //                               ? Colors.white.withValues(
-                      //                                 alpha: 0.5,
-                      //                               )
-                      //                               : Colors.black.withValues(
-                      //                                 alpha: 0.5,
-                      //                               ),
-                      //                     ),
-                      //                   ),
-                      //                 ],
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
                       //icon
-                      _gridIcon(),
+                      const GridIconWidget(),
                       //announcement
-                      _seeAll(colorScheme, context, 'announcement'.tr(), () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AnnouncementPage(),
-                          ),
-                        );
-                      }),
+                      SeeAllWidget(
+                        colorScheme: colorScheme,
+                        context: context,
+                        text: 'upcoming_events'.tr(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UpcomingEventPage(),
+                            ),
+                          );
+                        },
+                      ),
                       //announcement section
                       SizedBox(
                         height: 175,
@@ -977,14 +776,19 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       //event
-                      _seeAll(colorScheme, context, 'upcoming_events'.tr(), () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UpcomingEventPage(),
-                          ),
-                        );
-                      }),
+                      SeeAllWidget(
+                        colorScheme: colorScheme,
+                        context: context,
+                        text: 'upcoming_events'.tr(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UpcomingEventPage(),
+                            ),
+                          );
+                        },
+                      ),
                       //event section
                       SizedBox(
                         height: 175,
@@ -1208,214 +1012,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _nextPrayer() {
-    final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
-      imsak: imsak,
-      fajr: fajr,
-      sunrise: sunrise,
-      dhuhr: dhuhr,
-      asr: asr,
-      maghrib: maghrib,
-      isha: isha,
-    );
-
-    final nextPrayer = nextPrayerInfo.name;
-    final nextTime = DateFormat.jm().format(nextPrayerInfo.time);
-    final timeRemaining = nextPrayerInfo.timeRemaining;
-    return Row(
-      spacing: 4,
-      children: [
-        Icon(Icons.timer_outlined, color: Colors.white, size: 18),
-        Text(
-          "$nextPrayer: $nextTime",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text('to', style: TextStyle(color: Colors.white, fontSize: 16)),
-        Text(
-          timeRemaining,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _gridIcon() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWideScreen =
-            constraints.maxWidth > 600; // Threshold for wide screen
-
-        if (isWideScreen) {
-          // Single row for wider screens
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: 40,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconHomeWidget(
-                  iconName: Icons.menu_book,
-                  iconDescription: 'quran'.tr(),
-                  onTap: () {},
-                ),
-                IconHomeWidget(
-                  iconName: Icons.calendar_month,
-                  iconDescription: 'calendar'.tr(),
-                  onTap: () {},
-                ),
-                IconHomeWidget(
-                  iconName: Icons.volunteer_activism,
-                  iconDescription: 'donate'.tr(),
-                  onTap: () {},
-                ),
-                IconHomeWidget(
-                  iconName: Icons.explore,
-                  iconDescription: 'community'.tr(),
-                  onTap: () {},
-                ),
-                IconHomeWidget(
-                  iconName: Icons.mic,
-                  iconDescription: 'lectures'.tr(),
-                  onTap: () {},
-                ),
-                IconHomeWidget(
-                  iconName: Icons.more_horiz,
-                  iconDescription: 'more'.tr(),
-                  onTap: () {},
-                ),
-              ],
-            ),
-          );
-        } else {
-          // Two rows for phone screens
-          return Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconHomeWidget(
-                    iconName: Icons.menu_book,
-                    iconDescription: 'quran'.tr(),
-                    onTap: () {},
-                  ),
-
-                  IconHomeWidget(
-                    iconName: Icons.calendar_month,
-                    iconDescription: 'calender'.tr(),
-                    onTap: () {},
-                  ),
-                  IconHomeWidget(
-                    iconName: Icons.volunteer_activism,
-                    iconDescription: 'donate'.tr(),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconHomeWidget(
-                    iconName: Icons.volunteer_activism,
-                    iconDescription: 'donate'.tr(),
-                    onTap: () {},
-                  ),
-                  IconHomeWidget(
-                    iconName: Icons.mic,
-                    iconDescription: 'lecture'.tr(),
-                    onTap: () {},
-                  ),
-                  IconHomeWidget(
-                    iconName: Icons.more_horiz,
-                    iconDescription: 'more'.tr(),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-
   //
-  Widget _seeAll(
-    ColorScheme colorScheme,
-    BuildContext contex,
-    String text,
-    VoidCallback onTap,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onBackground,
-            ),
-          ),
-          const SizedBox(width: 8.0),
-          InkWell(
-            onTap: onTap,
-            child: Text(
-              context.tr("see_all"),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  //
-  Widget _buildGlassmorphicIcon(IconData icon, VoidCallback onPressed) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(50),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          width: 45,
-          height: 45,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: 0.2),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.5),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                spreadRadius: 1,
-              ),
-            ],
-          ),
-          child: IconButton(
-            onPressed: onPressed,
-            icon: Icon(icon, color: Colors.white, size: 22),
-          ),
-        ),
-      ),
-    );
-  }
 
   //
   Widget _buildDateCard(String gregorianDate, String hijriDate) {
