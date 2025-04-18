@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masjidku/features/quran/presentation/hadit_page.dart';
+import 'package:masjidku/features/hadit/presentation/hadit_page.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/event/upcoming_event_page.dart';

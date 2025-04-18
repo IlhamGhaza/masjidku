@@ -7,38 +7,38 @@ class GridIconWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isWideScreen =
-            constraints.maxWidth > 600; // Threshold for wide screen
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isWideScreen = constraints.maxWidth > 600;
 
-        if (isWideScreen) {
-          // Single row for wider screens
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: _buildIconWidgets(context)),
-          );
-        } else {
-          // Two rows for phone screens
-          return Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _buildIconWidgets(context).sublist(0, 3),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _buildIconWidgets(context).sublist(3),
-              ),
-            ],
-          );
-        }
-      },
+          if (isWideScreen) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: _buildIconWidgets(context)),
+            );
+          } else {
+            return Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: _buildIconWidgets(context).sublist(0, 3),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: _buildIconWidgets(context).sublist(3),
+                ),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 
- List<Widget> _buildIconWidgets(BuildContext context) {
+  List<Widget> _buildIconWidgets(BuildContext context) {
     return [
       IconHomeWidget(
         iconName: Icons.campaign,

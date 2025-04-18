@@ -704,107 +704,118 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                         ),
-                        const SizedBox(height: 8),
                         //announcement section
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: _announcements.length,
-                          itemBuilder: (context, index) {
-                            final itemColor =
-                                _iconColors[index % _iconColors.length];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: Container(
-                                width: double.infinity,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      isDarkMode ? Colors.black : Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
-                                      ),
-                                      offset: Offset(0, 1),
-                                      blurRadius: 3,
-                                      spreadRadius: 0,
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.06,
-                                      ),
-                                      offset: Offset(0, 3),
-                                      blurRadius: 8,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          color: itemColor.withValues(
-                                            alpha: 0.15,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
+                        SizedBox(
+                          height: 180,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: _announcements.length,
+                            itemBuilder: (context, index) {
+                              final itemColor =
+                                  _iconColors[index % _iconColors.length];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 85,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color:
+                                        isDarkMode
+                                            ? Colors.black
+                                            : Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
                                         ),
-                                        child: Icon(
-                                          _announcements[index]['icon'],
-                                          color: itemColor,
-                                        ),
+                                        offset: Offset(0, 1),
+                                        blurRadius: 3,
+                                        spreadRadius: 0,
                                       ),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              _announcements[index]['title'],
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: colorScheme.onBackground,
-                                              ),
-                                            ),
-                                            Text(
-                                              _announcements[index]['desc'],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: colorScheme.onBackground
-                                                    .withValues(alpha: 0.8),
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Text(
-                                              _announcements[index]['date'],
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: colorScheme.onBackground
-                                                    .withValues(alpha: 0.6),
-                                              ),
-                                            ),
-                                          ],
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.06,
                                         ),
+                                        offset: Offset(0, 3),
+                                        blurRadius: 8,
+                                        spreadRadius: 0,
                                       ),
                                     ],
                                   ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 56,
+                                          height: 56,
+                                          decoration: BoxDecoration(
+                                            color: itemColor.withValues(
+                                              alpha: 0.15,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            _announcements[index]['icon'],
+                                            color: itemColor,
+                                            size: 28,
+                                          ),
+                                        ),
+                                        SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                _announcements[index]['title'],
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      colorScheme.onBackground,
+                                                ),
+                                              ),
+                                              Text(
+                                                _announcements[index]['desc'],
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: colorScheme
+                                                      .onBackground
+                                                      .withValues(alpha: 0.8),
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                _announcements[index]['date'],
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: colorScheme
+                                                      .onBackground
+                                                      .withValues(alpha: 0.6),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
+
                         const SizedBox(height: 16),
                         //event
                         SeeAllWidget(
@@ -821,250 +832,234 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                         //event section
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: _events.length,
-                          itemBuilder: (context, index) {
-                            final itemColor =
-                                _iconColors[index % _iconColors.length];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: Container(
-                                width: double.infinity,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      isDarkMode ? Colors.black : Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.05,
+                        SizedBox(
+                          height: 180,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: BouncingScrollPhysics(),
+                            itemCount: _events.length,
+                            itemBuilder: (context, index) {
+                              final itemColor =
+                                  _iconColors[(index + 2) %
+                                      _iconColors
+                                          .length]; // Use different colors
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 85,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color:
+                                        isDarkMode
+                                            ? Colors.black
+                                            : Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.05,
+                                        ),
+                                        offset: Offset(0, 1),
+                                        blurRadius: 3,
+                                        spreadRadius: 0,
                                       ),
-                                      offset: Offset(0, 1),
-                                      blurRadius: 3,
-                                      spreadRadius: 0,
-                                    ),
-                                    BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.06,
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                          alpha: 0.06,
+                                        ),
+                                        offset: Offset(0, 3),
+                                        blurRadius: 8,
+                                        spreadRadius: 0,
                                       ),
-                                      offset: Offset(0, 3),
-                                      blurRadius: 8,
-                                      spreadRadius: 0,
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 60,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          color: itemColor.withValues(
-                                            alpha: 0.15,
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 56,
+                                          height: 56,
+                                          decoration: BoxDecoration(
+                                            color: itemColor.withValues(
+                                              alpha: 0.15,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                _events[index]['date'],
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: itemColor,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              Text(
+                                                _events[index]['month']
+                                                    .substring(0, 3),
+                                                style: TextStyle(
+                                                  color: itemColor,
+                                                  fontSize: 12,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              _events[index]['date'],
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                color: itemColor,
+                                        SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                _events[index]['name'],
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      colorScheme.onBackground,
+                                                ),
                                               ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            Text(
-                                              _events[index]['month'].substring(
-                                                0,
-                                                3,
-                                              ),
-                                              style: TextStyle(
-                                                color: itemColor,
-                                                fontSize: 12,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              _events[index]['name'],
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: colorScheme.onBackground,
-                                              ),
-                                            ),
-                                            Text(
-                                              _events[index]['desc'],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: colorScheme.onBackground
-                                                    .withValues(alpha: 0.8),
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.access_time,
-                                                  size: 12,
+                                              Text(
+                                                _events[index]['desc'],
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
                                                   color: colorScheme
                                                       .onBackground
-                                                      .withValues(alpha: 0.6),
+                                                      .withValues(alpha: 0.8),
                                                 ),
-                                                SizedBox(width: 4),
-                                                Text(
-                                                  _events[index]['time'],
-                                                  style: TextStyle(
-                                                    fontSize: 12,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.access_time,
+                                                    size: 12,
                                                     color: colorScheme
                                                         .onBackground
                                                         .withValues(alpha: 0.6),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                  SizedBox(width: 4),
+                                                  Text(
+                                                    _events[index]['time'],
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: colorScheme
+                                                          .onBackground
+                                                          .withValues(
+                                                            alpha: 0.6,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        //donate
-                        Text(
-                          context.tr('current_campaign'),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onBackground,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.network(
-                            'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: 200,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                height: 200,
-                                width: double.infinity,
-                                color: colorScheme.primaryContainer,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: colorScheme.onPrimaryContainer,
-                                    size: 40,
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
                             },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                height: 200,
-                                width: double.infinity,
-                                color: colorScheme.primaryContainer,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Mosque Renovation Project',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onBackground,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Help us renovate our mosque to accommodate more worshippers and improve facilities.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color:
-                                isDarkMode
-                                    ? Colors.white
-                                    : Colors.black.withValues(alpha: 0.7),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Donation successful!',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 50),
-                            padding: EdgeInsets.zero,
-                            backgroundColor:
-                                isDarkMode ? Colors.white : Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            context.tr('donate_now'),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.black : Colors.white,
-                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
+                        //donate
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr('current_campaign'),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onBackground,
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                height: 200,
+                                width: double.infinity,
+                                child: Image.network(
+                                  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              'Mosque Renovation Project',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: colorScheme.onBackground,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'Help us renovate our mosque to accommodate more worshippers and improve facilities.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color:
+                                    isDarkMode
+                                        ? Colors.white.withValues(alpha: 0.8)
+                                        : Colors.black.withValues(alpha: 0.7),
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Donation successful!',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50),
+                                padding: EdgeInsets.symmetric(vertical: 14),
+                                backgroundColor:
+                                    isDarkMode ? Colors.white : Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                context.tr('donate_now'),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isDarkMode ? Colors.black : Colors.white,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                          ],
+                        ),
                       ],
                     ),
                   ),
