@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   adhan: ^2.0.0+1
+  alarm: ^5.1.2
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   easy_localization: ^3.0.7+1
@@ -37,7 +38,6 @@ dependencies:
     sdk: flutter
   flutter_animate: ^4.5.2
   flutter_bloc: ^9.1.0
-  flutter_svg: ^2.0.17
   geocoding: ^3.0.0
   geolocator: ^14.0.0
   google_fonts: ^6.2.1

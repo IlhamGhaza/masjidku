@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
 
 import '../../../core/theme/theme.dart';
@@ -19,7 +19,6 @@ import '../../prayer/prayer_page.dart';
 import '../../account/presentation/profile_page.dart';
 import '../widget/glassmorphic_icon_widget.dart';
 import '../widget/grid_icon_widget.dart';
-import '../widget/icon_home_widget.dart';
 import '../widget/next_prayer_widget.dart';
 import '../widget/see_all_widget.dart';
 import 'notification_page.dart';
@@ -76,7 +75,7 @@ class _HomePageState extends State<HomePage> {
     AppTheme.lightTheme.colorScheme.onPrimaryContainer,
   ];
 
-  late final Color _selectedColor;
+  // late final Color _selectedColor;
   var myCoordinates = Coordinates(-6.537132990026773, 106.79284326451504);
   final params = CalculationMethod.singapore.getParameters();
   String? imsak;
@@ -88,12 +87,23 @@ class _HomePageState extends State<HomePage> {
   String? isha;
 
   bool _isLoading = true;
+  bool _isAnyAlarmOn = false;
+  final List<String> _prayerNames = [
+    'Imsak',
+    'Shubuh',
+    'Terbit',
+    'Zuhur',
+    'Ashar',
+    'Maghrib',
+    'Isya',
+  ];
 
   @override
   void initState() {
     super.initState();
+    _checkAlarmStatus();
     final random = Random();
-    _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
+    // _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
     loadLocation().then((_) {
       setState(() {
         _isLoading = false;
@@ -185,7 +195,7 @@ class _HomePageState extends State<HomePage> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.tr('location permission denied')),
+              content: Text(context.tr('loc_per_denied')),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -233,7 +243,7 @@ class _HomePageState extends State<HomePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  context.tr('location permission denied, please enable it'),
+                  context.tr('loc_per_denied_2'),
                   style: const TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 backgroundColor: Colors.red,
@@ -309,11 +319,43 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _handleRefresh() async {
     await refreshLocation();
-    // Contoh:
-    // await refreshEvents();
-    // await refreshAnnouncements();
+    await _checkAlarmStatus;
 
     setState(() {});
+  }
+
+  Future<void> _checkAlarmStatus() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      bool anyOn = false;
+      for (String prayerName in _prayerNames) {
+        // Check the boolean flag for each prayer alarm key
+        if (prefs.getBool('alarm_$prayerName') ?? false) {
+          anyOn = true;
+          break; // If one is found, no need to check further
+        }
+      }
+      // Update the state with the result
+      if (mounted) {
+        // Check if the widget is still in the tree
+        setState(() {
+          _isAnyAlarmOn = anyOn;
+          _isLoading = false; // Stop loading
+        });
+      }
+    } catch (e) {
+      // Handle potential errors reading SharedPreferences
+      print("Error reading alarm status: $e");
+      if (mounted) {
+        setState(() {
+          _isAnyAlarmOn = false; // Default to off on error
+          _isLoading = false; // Stop loading
+        });
+      }
+    }
   }
 
   @override
@@ -666,13 +708,19 @@ class _HomePageState extends State<HomePage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Icon(
-                                        Icons.notifications_active,
+                                        // Conditional Icon
+                                        _isAnyAlarmOn
+                                            ? Icons.notifications_active
+                                            : Icons.notifications_off_outlined,
                                         color: Colors.white,
                                         size: 14,
                                       ),
-                                      SizedBox(width: 2),
+                                      SizedBox(width: 4), // Adjusted spacing
                                       Text(
-                                        'Notif On',
+                                        // Conditional Text
+                                        _isAnyAlarmOn
+                                            ? 'Notif On'
+                                            : 'Notif Off',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -694,7 +742,7 @@ class _HomePageState extends State<HomePage> {
                         SeeAllWidget(
                           colorScheme: colorScheme,
                           context: context,
-                          text: 'announcements'.tr(),
+                          text: 'announcement'.tr(),
                           onTap: () {
                             Navigator.push(
                               context,

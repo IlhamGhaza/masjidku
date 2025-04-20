@@ -1,4 +1,5 @@
 import 'package:adhan/adhan.dart';
+import 'package:alarm/alarm.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,6 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
@@ -35,6 +37,10 @@ class _PrayerPageState extends State<PrayerPage>
   late Animation<double> _fadeAnimation;
   bool _isLoading = true;
 
+  Map<String, int> alarmIds = {};
+
+  Map<String, bool> alarmsSet = {};
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +52,10 @@ class _PrayerPageState extends State<PrayerPage>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
+    Alarm.init();
+
+    _loadAlarmStates();
+
     loadLocation().then((_) {
       setState(() {
         _isLoading = false;
@@ -54,6 +64,41 @@ class _PrayerPageState extends State<PrayerPage>
     });
 
     params.madhab = Madhab.shafi;
+  }
+
+  Future<void> _loadAlarmStates() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      alarmsSet = {
+        'Imsak': prefs.getBool('alarm_Imsak') ?? false,
+        'Shubuh': prefs.getBool('alarm_Shubuh') ?? false,
+        'Terbit': prefs.getBool('alarm_Terbit') ?? false,
+        'Zuhur': prefs.getBool('alarm_Zuhur') ?? false,
+        'Ashar': prefs.getBool('alarm_Ashar') ?? false,
+        'Maghrib': prefs.getBool('alarm_Maghrib') ?? false,
+        'Isya': prefs.getBool('alarm_Isya') ?? false,
+      };
+
+      alarmIds = {
+        'Imsak': prefs.getInt('alarmId_Imsak') ?? 0,
+        'Shubuh': prefs.getInt('alarmId_Shubuh') ?? 1,
+        'Terbit': prefs.getInt('alarmId_Terbit') ?? 2,
+        'Zuhur': prefs.getInt('alarmId_Zuhur') ?? 3,
+        'Ashar': prefs.getInt('alarmId_Ashar') ?? 4,
+        'Maghrib': prefs.getInt('alarmId_Maghrib') ?? 5,
+        'Isya': prefs.getInt('alarmId_Isya') ?? 6,
+      };
+    });
+  }
+
+  Future<void> _saveAlarmState(String prayerName, bool isSet) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('alarm_$prayerName', isSet);
+  }
+
+  Future<void> _saveAlarmId(String prayerName, int alarmId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('alarmId_$prayerName', alarmId);
   }
 
   @override
@@ -88,7 +133,6 @@ class _PrayerPageState extends State<PrayerPage>
       _isLoading = false;
     });
 
-    // Reset animation and play it again
     _animationController.reset();
     _animationController.forward();
   }
@@ -131,7 +175,6 @@ class _PrayerPageState extends State<PrayerPage>
             _isLoading = false;
           });
 
-          // Reset animation and play it again
           _animationController.reset();
           _animationController.forward();
         }
@@ -143,11 +186,11 @@ class _PrayerPageState extends State<PrayerPage>
         setState(() {
           _isLoading = false;
         });
-        // Show snackbar when permission is denied
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(context.tr('location permission denied')),
+              content: Text(context.tr('loc_per_denied')),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
               behavior: SnackBarBehavior.floating,
@@ -187,12 +230,11 @@ class _PrayerPageState extends State<PrayerPage>
         if (permissionStatus) {
           await refreshLocation();
         } else {
-          // Show snackbar when permission is denied
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  context.tr('location permission denied, please enable it'),
+                  context.tr('loc_per_denied_2'),
                   style: const TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 backgroundColor: Colors.red,
@@ -204,7 +246,7 @@ class _PrayerPageState extends State<PrayerPage>
               ),
             );
           }
-          // Use default coordinates
+
           final prayerTimes = PrayerTimes.today(myCoordinates, params);
           updatePrayerTimes(prayerTimes);
         }
@@ -222,7 +264,6 @@ class _PrayerPageState extends State<PrayerPage>
             updatePrayerTimes(prayerTimes);
           }
         } catch (e) {
-          // If geocoding fails, still calculate prayer times with saved coordinates
           myCoordinates = Coordinates(lat, lng);
           final prayerTimes = PrayerTimes.today(myCoordinates, params);
           updatePrayerTimes(prayerTimes);
@@ -568,7 +609,6 @@ class _PrayerPageState extends State<PrayerPage>
                                           ),
                                         ),
 
-                                        // Prayer times list
                                         Padding(
                                           padding: const EdgeInsets.all(16),
                                           child: Column(
@@ -625,7 +665,6 @@ class _PrayerPageState extends State<PrayerPage>
 
                                 const SizedBox(height: 24),
 
-                                // Next prayer indicator
                                 _buildNextPrayerIndicator(colorScheme)
                                     .animate()
                                     .fadeIn(duration: 800.ms, delay: 300.ms)
@@ -644,16 +683,210 @@ class _PrayerPageState extends State<PrayerPage>
     );
   }
 
-  // Add this import at the top of the file
+  DateTime _parseTimeString(String timeString, DateTime date) {
+    final format = DateFormat.jm();
+    final time = format.parse(timeString);
 
-  // Then modify the _buildPrayerTimeCard method
+    return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+  }
+
+  Future<void> _setAlarm(String prayerName, String timeString) async {
+    try {
+      final prayerDateTime = _parseTimeString(timeString, selectedDate);
+
+      if (prayerDateTime.isBefore(DateTime.now())) {
+        if (selectedDate.day == DateTime.now().day) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${context.tr('time_pass')} $prayerName'),
+              backgroundColor: Colors.orange,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+          return;
+        }
+      }
+
+      final alarmId = alarmIds[prayerName] ?? 0;
+
+      final alarmSettings = AlarmSettings(
+        id: alarmId,
+        dateTime: prayerDateTime,
+        assetAudioPath: 'assets/audios/mecca.mp3',
+        loopAudio: false,
+        vibrate: true,
+        volumeSettings: VolumeSettings.fade(
+          volume: 0.8,
+          fadeDuration: Duration(seconds: 5),
+          volumeEnforced: true,
+        ),
+        notificationSettings: NotificationSettings(
+          title: context.tr('prayer_time_for') + ' $prayerName',
+          body:
+              context.tr('its_time_for') +
+              ' $prayerName ' +
+              context.tr('prayer_at') +
+              ' $timeString',
+          stopButton: context.tr('stop'),
+          icon: 'notification_icon',
+          iconColor: Color(0xff862778),
+        ),
+      );
+
+      await Alarm.set(alarmSettings: alarmSettings);
+
+      setState(() {
+        alarmsSet[prayerName] = true;
+      });
+
+      await _saveAlarmState(prayerName, true);
+      await _saveAlarmId(prayerName, alarmId);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${context.tr('alarm_set')} $prayerName at $timeString',
+          ),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${context.tr('alarm_error')}: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _cancelAlarm(String prayerName) async {
+    try {
+      final alarmId = alarmIds[prayerName] ?? 0;
+
+      await Alarm.stop(alarmId);
+
+      setState(() {
+        alarmsSet[prayerName] = false;
+      });
+
+      await _saveAlarmState(prayerName, false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${context.tr('alarm_canceled')} $prayerName'),
+          backgroundColor: Colors.blue,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${context.tr('cancel_error')}: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _showSetAlarmDialog(
+    BuildContext context,
+    String prayerName,
+    String time,
+    ColorScheme colorScheme,
+  ) {
+    final bool isAlarmSet = alarmsSet[prayerName] ?? false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            isAlarmSet
+                ? context.tr('manage_alarm_for') + ' $prayerName'
+                : context.tr('set_alarm_for') + ' $prayerName',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!isAlarmSet)
+                Text(
+                  context.tr('would_you_like_to_set_alarm') +
+                      ' $prayerName at $time?',
+                ),
+              if (isAlarmSet)
+                Text(context.tr('alarm_already_set') + ' $prayerName at $time'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 18, color: colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(context.tr('prayer_time') + '$time'),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(context.tr('cancel')),
+            ),
+            if (!isAlarmSet)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _setAlarm(prayerName, time);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(context.tr('set_alarm')),
+              ),
+            if (isAlarmSet)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _cancelAlarm(prayerName);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(context.tr('cancel_alarm')),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildPrayerTimeCard(
     String name,
     String time,
     ColorScheme colorScheme,
     int index,
   ) {
-    // Get the current prayer
     final currentPrayer = PrayerTimeUtils.getCurrentPrayer(
       imsak: imsak,
       fajr: fajr,
@@ -664,8 +897,9 @@ class _PrayerPageState extends State<PrayerPage>
       isha: isha,
     );
 
-    // Check if this is the current prayer
     final isCurrentPrayer = (name == currentPrayer);
+
+    final isAlarmSet = alarmsSet[name] ?? false;
 
     return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
@@ -737,7 +971,7 @@ class _PrayerPageState extends State<PrayerPage>
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            'Now',
+                            context.tr('now'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -766,20 +1000,25 @@ class _PrayerPageState extends State<PrayerPage>
                       const SizedBox(width: 8),
                       IconButton(
                         onPressed: () {
-                          // Show a dialog to set alarm
-                          _showSetAlarmDialog(context, name, time);
+                          _showSetAlarmDialog(context, name, time, colorScheme);
                         },
                         icon: Icon(
-                          Icons.notifications_outlined,
+                          isAlarmSet
+                              ? Icons.notifications_active
+                              : Icons.notifications_outlined,
                           color:
-                              isCurrentPrayer
+                              isAlarmSet
+                                  ? Colors.orange
+                                  : isCurrentPrayer
                                   ? colorScheme.primary
                                   : colorScheme.onSurfaceVariant,
                           size: 20,
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor:
-                              isCurrentPrayer
+                              isAlarmSet
+                                  ? Colors.orange.withValues(alpha: 0.2)
+                                  : isCurrentPrayer
                                   ? colorScheme.primaryContainer.withValues(
                                     alpha: 0.5,
                                   )
@@ -820,61 +1059,7 @@ class _PrayerPageState extends State<PrayerPage>
     }
   }
 
-  void _showSetAlarmDialog(
-    BuildContext context,
-    String prayerName,
-    String time,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Set Alarm for $prayerName'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Would you like to set an alarm for $prayerName at $time?'),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Icon(Icons.access_time, size: 18),
-                  const SizedBox(width: 8),
-                  Text('Prayer time: $time'),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Implement alarm setting functionality
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Alarm set for $prayerName at $time'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                );
-              },
-              child: Text('Set Alarm'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget _buildNextPrayerIndicator(ColorScheme colorScheme) {
-    // Get the next prayer time using our utility class
     final nextPrayerInfo = PrayerTimeUtils.getNextPrayer(
       imsak: imsak,
       fajr: fajr,
@@ -888,6 +1073,8 @@ class _PrayerPageState extends State<PrayerPage>
     final nextPrayer = nextPrayerInfo.name;
     final nextTime = DateFormat.jm().format(nextPrayerInfo.time);
     final timeRemaining = nextPrayerInfo.timeRemaining;
+
+    final isAlarmSet = alarmsSet[nextPrayer] ?? false;
 
     return Container(
       width: double.infinity,
@@ -906,13 +1093,49 @@ class _PrayerPageState extends State<PrayerPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.tr('next_prayer'),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onPrimaryContainer,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                context.tr('next_prayer'),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
+              if (isAlarmSet)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.orange),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.notifications_active,
+                        size: 14,
+                        color: Colors.orange,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        context.tr('alarm_set'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           Row(
@@ -983,13 +1206,40 @@ class _PrayerPageState extends State<PrayerPage>
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          ElevatedButton.icon(
+            onPressed: () {
+              if (isAlarmSet) {
+                _cancelAlarm(nextPrayer);
+              } else {
+                _setAlarm(nextPrayer, nextTime);
+              }
+            },
+            icon: Icon(
+              isAlarmSet ? Icons.notifications_off : Icons.notifications_active,
+              size: 18,
+            ),
+            label: Text(
+              isAlarmSet
+                  ? context.tr('cancel_next_prayer_alarm')
+                  : context.tr('set_next_prayer_alarm'),
+              style: TextStyle(fontSize: 14),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isAlarmSet ? Colors.red : colorScheme.primary,
+              foregroundColor: Colors.white,
+              minimumSize: Size(double.infinity, 40),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-// Extension method to add spacing between widgets in a column or row
 extension SpacingExtension on List<Widget> {
   List<Widget> get spacing {
     if (isEmpty) return this;
@@ -1002,7 +1252,6 @@ extension SpacingExtension on List<Widget> {
   }
 }
 
-// Extension method to add withValues to Color for opacity
 extension ColorExtension on Color {
   Color withValues({int? red, int? green, int? blue, double? alpha}) {
     return Color.fromRGBO(

@@ -587,7 +587,7 @@ class _FinanceReportPageState extends State<FinanceReportPage> {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),

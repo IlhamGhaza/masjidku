@@ -1,5 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-
 
 import '../../../core/theme/theme.dart';
 import '../widget/auth_button.dart';
@@ -91,7 +91,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Lupa Password',
+                  context.tr('forgot_password'),
                   style: theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.colorScheme.onBackground,
@@ -99,7 +99,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Masukkan email anda untuk menerima link reset password',
+                  context.tr('enter_email_for_password_reset'),
                   style: theme.textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -121,12 +121,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Email tidak boleh kosong';
+                return 'empty_email'.tr();
               }
               if (!RegExp(
                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
               ).hasMatch(value)) {
-                return 'Masukkan email yang valid';
+                return 'invalid_email'.tr();
               }
               return null;
             },
@@ -136,7 +136,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
           // Reset Password Button
           AuthButton(
-            text: 'Kirim Link Reset',
+            text: 'send_link_reset_password'.tr(),
             onPressed: _handleResetPassword,
             isLoading: _isLoading,
           ),
@@ -153,7 +153,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Navigator.of(context).pop();
                 },
                 child: Text(
-                  'Masuk',
+                  context.tr('login'),
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

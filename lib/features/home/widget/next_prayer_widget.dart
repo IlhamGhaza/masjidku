@@ -46,12 +46,12 @@ class NextPrayerWidget extends StatelessWidget {
           "$nextPrayer: $nextTime",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
         ),
         SizedBox(width: 4),
-        Text('to', style: TextStyle(color: Colors.white, fontSize: 16)),
+        Text('|', style: TextStyle(color: Colors.white, fontSize: 14)),
         SizedBox(width: 4),
         Text(
           timeRemaining,

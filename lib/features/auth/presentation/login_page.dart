@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/auth_button.dart';
 import '../widget/auth_text_field.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -82,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Selamat Datang',
+                          context.tr('welcome'),
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onBackground,
@@ -90,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Masuk untuk melanjutkan ke Masjidku',
+                          context.tr('sign_in_to_continue'),
                           style: theme.textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -112,12 +114,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Email tidak boleh kosong';
+                        return 'empty_email'.tr();
                       }
                       if (!RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                       ).hasMatch(value)) {
-                        return 'Masukkan email yang valid';
+                        return 'invalid_email'.tr();
                       }
                       return null;
                     },
@@ -146,10 +148,15 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password tidak boleh kosong';
+                        return 'empty_password'.tr();
                       }
-                      if (value.length < 6) {
-                        return 'Password minimal 6 karakter';
+                      if (value.length < 8) {
+                        return 'password_too_short'.tr();
+                      }
+                      if (!RegExp(
+                        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+                      ).hasMatch(value)) {
+                        return 'password_must_contain'.tr();
                       }
                       return null;
                     },
@@ -165,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         // TODO: Navigate to forgot password
                       },
                       child: Text(
-                        'Lupa Password?',
+                        context.tr('forgot_password'),
                         style: TextStyle(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
@@ -178,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Login Button
                   AuthButton(
-                    text: 'Masuk',
+                    text: 'login'.tr(),
                     onPressed: _handleLogin,
                     isLoading: _isLoading,
                   ),
@@ -191,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(child: Divider(color: theme.dividerTheme.color)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text('Atau', style: theme.textTheme.bodyMedium),
+                        child: Text(context.tr('or'), style: theme.textTheme.bodyMedium),
                       ),
                       Expanded(child: Divider(color: theme.dividerTheme.color)),
                     ],
@@ -201,9 +208,15 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Register Button
                   AuthButton(
-                    text: 'Daftar Akun Baru',
+                    text: 'sing_up'.tr(),
                     onPressed: () {
                       // TODO: Navigate to register page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPage(),
+                        ),
+                      );
                     },
                     isOutlined: true,
                   ),

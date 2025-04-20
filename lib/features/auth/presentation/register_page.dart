@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 import '../widget/auth_button.dart';
@@ -12,7 +13,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -22,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -120,25 +121,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Name Field
                   AuthTextField(
-                    label: 'Nama Lengkap',
-                    hint: 'Masukkan nama lengkap anda',
-                    controller: _nameController,
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                      color: theme.colorScheme.primary,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Nama tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Username Field
-                  AuthTextField(
                     label: 'Username',
                     hint: 'Masukkan username anda',
                     controller: _usernameController,
@@ -148,10 +130,40 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Username tidak boleh kosong';
+                        return 'empty_username'.tr();
                       }
-                      if (value.length < 4) {
-                        return 'Username minimal 4 karakter';
+                      if (value.length < 3) {
+                        return 'username_too_short'.tr();
+                      }
+                      if (value.length > 20) {
+                        return 'username_too_long'.tr();
+                      }
+                      if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+                        return 'invalid_username'.tr();
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Email Field
+                  AuthTextField(
+                    label: 'Email',
+                    hint: 'Email',
+                    controller: _emailController,
+                    prefixIcon: Icon(
+                      Icons.email_outlined,
+                      color: theme.colorScheme.primary,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'empty_email'.tr();
+                      }
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
+                        return 'invalid_email'.tr();
                       }
                       return null;
                     },
@@ -180,10 +192,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Password tidak boleh kosong';
+                        return 'empty_password'.tr();
                       }
-                      if (value.length < 6) {
-                        return 'Password minimal 6 karakter';
+                      if (value.length < 8) {
+                        return 'password_too_short'.tr();
+                      }
+                      if (!RegExp(
+                        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+                      ).hasMatch(value)) {
+                        return 'password_must_contain'.tr();
                       }
                       return null;
                     },
@@ -212,10 +229,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Konfirmasi password tidak boleh kosong';
+                        return 'empty_confirm_password'.tr();
                       }
                       if (value != _passwordController.text) {
-                        return 'Password tidak sama';
+                        return 'password_not_match'.tr();
+                      }
+                      if (value.length < 8) {
+                        return 'password_too_short'.tr();
                       }
                       return null;
                     },
@@ -225,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // Register Button
                   AuthButton(
-                    text: 'Daftar',
+                    text: 'sign_up'.tr(),
                     onPressed: _handleRegister,
                     isLoading: _isLoading,
                   ),
@@ -237,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Sudah punya akun?',
+                        context.tr('have_account'),
                         style: theme.textTheme.bodyMedium,
                       ),
                       TextButton(
@@ -245,7 +265,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Navigator.of(context).pop();
                         },
                         child: Text(
-                          'Masuk',
+                          context.tr('sign_in'),
                           style: TextStyle(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
