@@ -719,7 +719,7 @@ class _PrayerPageState extends State<PrayerPage>
         loopAudio: false,
         vibrate: true,
         volumeSettings: VolumeSettings.fade(
-          volume: 0.8,
+          volume: 0.3,
           fadeDuration: Duration(seconds: 5),
           volumeEnforced: true,
         ),

@@ -23,6 +23,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await Quran.initialize();
   await Alarm.init();
+  await
   AlarmPermissions.checkNotificationPermission();
   if (Alarm.android) {
     AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
