@@ -1,4 +1,5 @@
 import 'package:adhan/adhan.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:alarm/alarm.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +9,13 @@ import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:timezone/data/latest.dart' as tz_data;
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
 import '../../core/utils/permisson_utils.dart';
 import '../../core/utils/prayertimeinfo.dart';
 import '../../data/datasource/db_local_datasource.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class PrayerPage extends StatefulWidget {
   const PrayerPage({super.key});
@@ -24,6 +26,9 @@ class PrayerPage extends StatefulWidget {
 
 class _PrayerPageState extends State<PrayerPage>
     with SingleTickerProviderStateMixin {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  bool notificationsInitialized = false;
   var myCoordinates = Coordinates(-6.537132990026773, 106.79284326451504);
   final params = CalculationMethod.singapore.getParameters();
   String? imsak;
@@ -35,11 +40,120 @@ class _PrayerPageState extends State<PrayerPage>
   String? isha;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  final local = tz.local;
   bool _isLoading = true;
 
   Map<String, int> alarmIds = {};
 
   Map<String, bool> alarmsSet = {};
+
+  Future<void> _initializeNotifications() async {
+    if (notificationsInitialized) return;
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    final DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    notificationsInitialized = true;
+  }
+
+  Future<void> _schedulePersistentNotification(
+    String prayerName,
+    DateTime prayerTime,
+  ) async {
+    await _initializeNotifications();
+
+    final int notificationId = alarmIds[prayerName] ?? 0;
+
+    // Only schedule if the prayer time is in the future
+    if (prayerTime.isAfter(DateTime.now())) {
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+            'prayer_channel',
+            'Prayer Times',
+            channelDescription: 'Notifications for prayer times',
+            importance: Importance.max,
+            priority: Priority.high,
+            ongoing: true, // Makes notification persistent
+            autoCancel: false, // Prevents user from dismissing
+          );
+
+      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
+          DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          );
+
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId,
+        context.tr('prayer_time_for') + ' $prayerName',
+        context.tr('its_time_for') +
+            ' $prayerName ' +
+            context.tr('prayer_at') +
+            ' ${DateFormat.jm().format(prayerTime)}',
+        tz.TZDateTime.from(prayerTime, local),
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    }
+  }
+
+  Future<void> _scheduleAllPrayerNotifications() async {
+    if (imsak != null) {
+      final imsakTime = _parseTimeString(imsak!, selectedDate);
+      await _schedulePersistentNotification('Imsak', imsakTime);
+    }
+
+    if (fajr != null) {
+      final fajrTime = _parseTimeString(fajr!, selectedDate);
+      await _schedulePersistentNotification('Shubuh', fajrTime);
+    }
+
+    if (sunrise != null) {
+      final sunriseTime = _parseTimeString(sunrise!, selectedDate);
+      await _schedulePersistentNotification('Terbit', sunriseTime);
+    }
+
+    if (dhuhr != null) {
+      final dhuhrTime = _parseTimeString(dhuhr!, selectedDate);
+      await _schedulePersistentNotification('Zuhur', dhuhrTime);
+    }
+
+    if (asr != null) {
+      final asrTime = _parseTimeString(asr!, selectedDate);
+      await _schedulePersistentNotification('Ashar', asrTime);
+    }
+
+    if (maghrib != null) {
+      final maghribTime = _parseTimeString(maghrib!, selectedDate);
+      await _schedulePersistentNotification('Maghrib', maghribTime);
+    }
+
+    if (isha != null) {
+      final ishaTime = _parseTimeString(isha!, selectedDate);
+      await _schedulePersistentNotification('Isya', ishaTime);
+    }
+  }
 
   @override
   void initState() {
@@ -52,8 +166,10 @@ class _PrayerPageState extends State<PrayerPage>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
-    Alarm.init();
+    // Initialize timezone data
+    tz_data.initializeTimeZones();
 
+    Alarm.init();
     _loadAlarmStates();
 
     loadLocation().then((_) {
@@ -61,6 +177,9 @@ class _PrayerPageState extends State<PrayerPage>
         _isLoading = false;
       });
       _animationController.forward();
+
+      // Schedule notifications after loading prayer times
+      _scheduleAllPrayerNotifications();
     });
 
     params.madhab = Madhab.shafi;
@@ -135,6 +254,7 @@ class _PrayerPageState extends State<PrayerPage>
 
     _animationController.reset();
     _animationController.forward();
+    _scheduleAllPrayerNotifications();
   }
 
   void onChangeDate(int days) {
@@ -299,6 +419,7 @@ class _PrayerPageState extends State<PrayerPage>
       isha = DateFormat.jm().format(prayerTimes.isha);
       _isLoading = false;
     });
+    _scheduleAllPrayerNotifications();
   }
 
   DateTime selectedDate = DateTime.now();
@@ -683,6 +804,26 @@ class _PrayerPageState extends State<PrayerPage>
     );
   }
 
+  /// Parse a time string in the format of "HH:mm" and return the corresponding
+  /// DateTime object with the given [date].
+  ///
+  /// The [timeString] will be parsed with the [DateFormat.jm()] format, and the
+  /// resulting [DateTime] object will be constructed with the year, month, day,
+  /// hour, and minute from the parsed time and the given [date].
+  ///
+  /// The returned [DateTime] object will have the same year, month, and day as
+  /// the given [date], and the hour and minute will be taken from the parsed
+  /// time.
+  ///
+  /// If the [timeString] is null or empty, or if the [date] is null, the
+  /// function will throw an exception.
+  ///
+  /// Example:
+  ///
+  ///     final date = DateTime(2022, 1, 1);
+  ///     final timeString = '12:34';
+  ///     final parsedDateTime = _parseTimeString(timeString, date);
+  ///     // parsedDateTime is DateTime(2022, 1, 1, 12, 34)
   DateTime _parseTimeString(String timeString, DateTime date) {
     final format = DateFormat.jm();
     final time = format.parse(timeString);
