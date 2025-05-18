@@ -40,7 +40,7 @@ class _PrayerPageState extends State<PrayerPage>
   String? isha;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  final local = tz.local;
+  late tz.Location local;
   bool _isLoading = true;
 
   Map<String, int> alarmIds = {};
@@ -106,11 +106,8 @@ class _PrayerPageState extends State<PrayerPage>
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
         notificationId,
-        context.tr('prayer_time_for') + ' $prayerName',
-        context.tr('its_time_for') +
-            ' $prayerName ' +
-            context.tr('prayer_at') +
-            ' ${DateFormat.jm().format(prayerTime)}',
+        '${context.tr('prayer_time_for')} $prayerName',
+        '${context.tr('its_time_for')} $prayerName ${context.tr('prayer_at')} ${DateFormat.jm().format(prayerTime)}',
         tz.TZDateTime.from(prayerTime, local),
         platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -168,6 +165,7 @@ class _PrayerPageState extends State<PrayerPage>
 
     // Initialize timezone data
     tz_data.initializeTimeZones();
+    local = tz.local;
 
     Alarm.init();
     _loadAlarmStates();
