@@ -41,6 +41,7 @@ class _PrayerPageState extends State<PrayerPage>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late tz.Location local;
+  bool _isLocalTimeZoneResolved = true;
   bool _isLoading = true;
 
   Map<String, int> alarmIds = {};
@@ -165,7 +166,17 @@ class _PrayerPageState extends State<PrayerPage>
 
     // Initialize timezone data
     tz_data.initializeTimeZones();
-    local = tz.local;
+    try {
+      local = tz.local;
+      _isLocalTimeZoneResolved = true;
+    } catch (e) {
+      // Log the error for debugging.
+      debugPrint("Error initializing local timezone: $e. Falling back to UTC for notifications.");
+      // Fallback to UTC to prevent LateInitializationError.
+      // Notifications might be scheduled based on UTC if local timezone is not found.
+      local = tz.UTC;
+      _isLocalTimeZoneResolved = false;
+    }
 
     Alarm.init();
     _loadAlarmStates();
