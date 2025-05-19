@@ -129,5 +129,11 @@
     "sign_in_to_continue": "Masuk untuk melanjutkan",
     "sign_up": "Daftar",
     "send_link_reset_password": "Kirim Tautan Reset Kata Sandi",
-    "next_prayer": "Shalat Berikutnya"
+    "next_prayer": "Shalat Berikutnya",
+    "oops_something_went_wrong": "Oops! Terjadi kesalahan",
+    "app_encountered_error": "Aplikasi mengalami kesalahan yang tidak terduga. Kami sedang berusaha memperbaikinya.",
+    "please_restart_app": "Silakan coba restart aplikasi",
+    "we_apologize_for_inconvenience": "Kami mohon maaf atas ketidaknyamanan ini",
+    "retry": "Coba Lagi",
+    "go_to_home": "Kembali ke Beranda"
 }

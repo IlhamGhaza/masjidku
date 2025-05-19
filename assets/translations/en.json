@@ -129,5 +129,11 @@
   "sign_in_to_continue": "Sign in to continue",
   "sign_up": "Sign up",
   "send_link_reset_password": "Send Password Reset Link",
-  "next_prayer": "Next Prayer"
+  "next_prayer": "Next Prayer",
+  "oops_something_went_wrong": "Oops! Something went wrong",
+  "app_encountered_error": "The app encountered an unexpected error. We're working on fixing it.",
+  "please_restart_app": "Please try restarting the app",
+  "we_apologize_for_inconvenience": "We apologize for the inconvenience",
+  "retry": "Retry",
+  "go_to_home": "Go to Home"
 }

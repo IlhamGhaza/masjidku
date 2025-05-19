@@ -9,27 +9,39 @@ import 'core/theme/language_cubit.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/utils/permission.dart';
+import 'error_handle_page.dart';
 import 'features/auth/presentation/splash_page.dart';
 import 'package:quran_flutter/quran_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory:
-        kIsWeb
-            ? HydratedStorageDirectory.web
-            : HydratedStorageDirectory((await getTemporaryDirectory()).path),
-  );
-  await EasyLocalization.ensureInitialized();
-  await Quran.initialize();
-  await Alarm.init();
-  await
-  AlarmPermissions.checkNotificationPermission();
-  if (Alarm.android) {
-    AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
-  }
-   runApp(const MyApp());
 
+  // Set up error handling
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Log the error but don't show it to the user
+    FlutterError.dumpErrorToConsole(details);
+  };
+
+  try {
+    HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory:
+          kIsWeb
+              ? HydratedStorageDirectory.web
+              : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+    );
+    await EasyLocalization.ensureInitialized();
+    await Quran.initialize();
+    await Alarm.init();
+    await AlarmPermissions.checkNotificationPermission();
+    if (Alarm.android) {
+      AlarmPermissions.checkAndroidScheduleExactAlarmPermission();
+    }
+  } catch (e) {
+    // Log initialization errors but continue with the app
+    debugPrint('Initialization error: $e');
+  }
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -46,22 +58,67 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (context) => ThemeCubit()),
           BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
         ],
-        child: BlocBuilder<ThemeCubit, ThemeMode>(
-          builder: (context, themeMode) {
-            return MaterialApp(
-              title: 'MasjidKu',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeMode,
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              home: const SplashPage(),
-            );
-          },
+        child: ErrorHandler(
+          child: BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp(
+                title: 'MasjidKu',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeMode,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                home: const SplashPage(),
+              );
+            },
+          ),
         ),
       ),
     );
+  }
+}
+
+class ErrorHandler extends StatefulWidget {
+  final Widget child;
+
+  const ErrorHandler({Key? key, required this.child}) : super(key: key);
+
+  @override
+  State<ErrorHandler> createState() => _ErrorHandlerState();
+}
+
+class _ErrorHandlerState extends State<ErrorHandler> {
+  FlutterErrorDetails? _errorDetails;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Override the error handler to capture errors in the widget tree
+    FlutterError.onError = (FlutterErrorDetails details) {
+      FlutterError.dumpErrorToConsole(details);
+      setState(() {
+        _errorDetails = details;
+        _hasError = true;
+      });
+    };
+  }
+
+  void _retry() {
+    setState(() {
+      _hasError = false;
+      _errorDetails = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) {
+      return ErrorHandlerPage(errorDetails: _errorDetails, onRetry: _retry);
+    }
+
+    return widget.child;
   }
 }
