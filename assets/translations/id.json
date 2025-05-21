@@ -105,7 +105,7 @@
     "prayer_time_for": "Waktu Shalat Untuk",
     "loc_per_denied": "izin lokasi ditolak",
     "loc_per_denied_2": "izin lokasi ditolak, mohon aktifkan",
-    "now": "Sekarang",
+    "now": "Now",
     "enter_email_for_password_reset": "Masukkan email Anda untuk menerima tautan reset kata sandi",
     "invalid_email": "Masukkan email yang valid",
     "empty_email": "Email tidak boleh kosong",
@@ -135,5 +135,7 @@
     "please_restart_app": "Silakan coba restart aplikasi",
     "we_apologize_for_inconvenience": "Kami mohon maaf atas ketidaknyamanan ini",
     "retry": "Coba Lagi",
+    "set_alarm": "Atur Alarm",
+    "cancel_alarm": "Batalkan Alarm",
     "go_to_home": "Kembali ke Beranda"
 }

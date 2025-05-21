@@ -135,5 +135,7 @@
   "please_restart_app": "Please try restarting the app",
   "we_apologize_for_inconvenience": "We apologize for the inconvenience",
   "retry": "Retry",
+  "set_alarm": "Set Alarm",
+  "cancel_alarm": "Cancel Alarm",
   "go_to_home": "Go to Home"
 }

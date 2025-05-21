@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../widget/auth_button.dart';
 import '../widget/auth_text_field.dart';
+import 'forgot_password_page.dart';
 import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -169,7 +170,12 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // TODO: Navigate to forgot password
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordPage(),
+                          ),
+                        );
                       },
                       child: Text(
                         context.tr('forgot_password'),
@@ -198,7 +204,10 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(child: Divider(color: theme.dividerTheme.color)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(context.tr('or'), style: theme.textTheme.bodyMedium),
+                        child: Text(
+                          context.tr('or'),
+                          style: theme.textTheme.bodyMedium,
+                        ),
                       ),
                       Expanded(child: Divider(color: theme.dividerTheme.color)),
                     ],
@@ -208,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Register Button
                   AuthButton(
-                    text: 'sing_up'.tr(),
+                    text: 'sign_up'.tr(),
                     onPressed: () {
                       // TODO: Navigate to register page
                       Navigator.push(
