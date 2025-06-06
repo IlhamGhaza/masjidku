@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:adhan/adhan.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:hijriyah_indonesia/hijriyah_indonesia.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ui';
-
+import '../../../core/services/prayer_notification_service.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/theme/theme_cubit.dart';
 import '../../../core/utils/permisson_utils.dart';
@@ -101,7 +100,17 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    final notificationService = PrayerNotificationService();
+    notificationService.setNotificationResponseCallback((response) {
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PrayerPage()),
+        );
+      }
+    });
     _checkAlarmStatus();
+    _schedulePrayerNotifications();
     final random = Random();
     // _selectedColor = _iconColors[random.nextInt(_iconColors.length)];
     loadLocation().then((_) {
@@ -116,6 +125,31 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _schedulePrayerNotifications() {
+    if (imsak != null &&
+        fajr != null &&
+        sunrise != null &&
+        dhuhr != null &&
+        asr != null &&
+        maghrib != null &&
+        isha != null) {
+      final notificationService = PrayerNotificationService();
+      notificationService.scheduleAllPrayerNotifications(
+        imsak: imsak,
+        fajr: fajr,
+        sunrise: sunrise,
+        dhuhr: dhuhr,
+        asr: asr,
+        maghrib: maghrib,
+        isha: isha,
+        selectedDate: DateTime.now(),
+        context: context,
+        latitude: myCoordinates.latitude,
+        longitude: myCoordinates.longitude,
+      );
+    }
   }
 
   void calculatePrayerTimes(DateTime date) {
@@ -311,6 +345,7 @@ class _HomePageState extends State<HomePage> {
       maghrib = DateFormat.jm().format(prayerTimes.maghrib);
       isha = DateFormat.jm().format(prayerTimes.isha);
       _isLoading = false;
+      _schedulePrayerNotifications();
     });
   }
 

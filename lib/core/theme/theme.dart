@@ -35,8 +35,8 @@ class AppTheme {
     ),
 
     // Card
-    cardTheme: CardTheme(
-      color: const Color(0xFFFFFFFF),
+    cardTheme: CardThemeData(
+      color: const Color(0xFFFFFFFF), // Use CardThemeData
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
@@ -99,8 +99,8 @@ class AppTheme {
     ),
 
     // Card
-    cardTheme: CardTheme(
-      color: const Color(0xFF1E1E1E),
+    cardTheme: CardThemeData(
+      color: const Color(0xFF1E1E1E), // Use CardThemeData
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),

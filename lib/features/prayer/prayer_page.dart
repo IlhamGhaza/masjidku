@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
+import '../../core/services/prayer_notification_service.dart';
 import '../../core/theme/theme.dart';
 import '../../core/theme/theme_cubit.dart';
 import '../../core/utils/permisson_utils.dart';
@@ -48,106 +49,25 @@ class _PrayerPageState extends State<PrayerPage>
 
   Map<String, bool> alarmsSet = {};
 
-  Future<void> _initializeNotifications() async {
-    if (notificationsInitialized) return;
-    debugPrint('[PrayerPage] Initializing local notifications...');
+  final PrayerNotificationService _notificationService =
+      PrayerNotificationService();
 
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+  Future<void> _scheduleAllPrayerNotifications() async {
+    debugPrint('[PrayerPage] _scheduleAllPrayerNotifications called.');
 
-    final DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
-          requestAlertPermission: true,
-          requestBadgePermission: true,
-          requestSoundPermission: true,
-        );
-
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-          android: initializationSettingsAndroid,
-          iOS: initializationSettingsIOS,
-        );
-
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: _onDidReceiveNotificationResponse,
+    await _notificationService.scheduleAllPrayerNotifications(
+      imsak: imsak,
+      fajr: fajr,
+      sunrise: sunrise,
+      dhuhr: dhuhr,
+      asr: asr,
+      maghrib: maghrib,
+      isha: isha,
+      selectedDate: selectedDate,
+      context: context,
+      latitude: myCoordinates.latitude,
+      longitude: myCoordinates.longitude,
     );
-
-    notificationsInitialized = true;
-    debugPrint('[PrayerPage] Local notifications initialized successfully.');
-  }
-
-
-  /// Schedules a persistent local notification for the given prayer name at the given
-  /// prayer time. The notification will have a unique ID based on the prayer name and
-  /// will be scheduled using the local timezone. If the prayer time is in the past, the
-  /// notification will not be scheduled.
-  Future<void> _schedulePersistentNotification(
-    String prayerName,
-    DateTime prayerTime,
-  ) async {
-    await _initializeNotifications();
-    debugPrint(
-      '[PrayerPage] Attempting to schedule persistent notification for $prayerName at $prayerTime',
-    );
-
-    final int notificationId = alarmIds[prayerName] ?? 0;
-    debugPrint('[PrayerPage] Notification ID for $prayerName: $notificationId');
-
-    // Only schedule if the prayer time is in the future
-    if (prayerTime.isAfter(DateTime.now())) {
-      debugPrint(
-        '[PrayerPage] Prayer time for $prayerName is in the future. Proceeding with scheduling.',
-      );
-      const AndroidNotificationDetails androidPlatformChannelSpecifics =
-          AndroidNotificationDetails(
-            'prayer_channel',
-            'Prayer Times',
-            channelDescription: 'Notifications for prayer times',
-            importance: Importance.max,
-            priority: Priority.high,
-            ongoing: true, // Makes notification persistent
-            autoCancel: false, // Prevents user from dismissing
-          );
-
-      const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-          DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true,
-          );
-
-      const NotificationDetails platformChannelSpecifics = NotificationDetails(
-        android: androidPlatformChannelSpecifics,
-        iOS: iOSPlatformChannelSpecifics,
-      );
-
-      try {
-        debugPrint(
-          '[PrayerPage] Scheduling notification for $prayerName with ID $notificationId at $prayerTime using timezone $local',
-        );
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-          notificationId,
-          '${context.tr('prayer_time_for')} $prayerName',
-          '${context.tr('its_time_for')} $prayerName ${context.tr('prayer_at')} ${DateFormat.jm().format(prayerTime)}',
-          tz.TZDateTime.from(prayerTime, local),
-          platformChannelSpecifics,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          payload: 'prayer_page_notification', // Tambahkan payload ini
-        );
-        debugPrint(
-          '[PrayerPage] Successfully scheduled notification for $prayerName (ID: $notificationId).',
-        );
-      } catch (e) {
-        debugPrint(
-          '[PrayerPage] ERROR scheduling notification for $prayerName (ID: $notificationId): $e',
-        );
-      }
-    } else {
-      debugPrint(
-        '[PrayerPage] Prayer time for $prayerName ($prayerTime) is in the past. Notification not scheduled.',
-      );
-    }
   }
 
   /// Called when a notification is tapped.
@@ -172,61 +92,22 @@ class _PrayerPageState extends State<PrayerPage>
         // Jika PrayerPage sudah terbuka, ini akan membuka satu lagi di atasnya.
         // Pertimbangkan logika navigasi yang lebih canggih jika perlu
         // (misalnya, menggunakan Navigator.pushReplacement atau memeriksa apakah sudah di PrayerPage).
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const PrayerPage(),
-        ));
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const PrayerPage()));
       }
     }
-  }
-
-  /// Jadwalkan notifikasi untuk semua waktu sholat di tanggal yang
-  /// saat ini dipilih. Notifikasi akan dijadwalkan berdasarkan waktu
-  /// lokal jika zona waktu lokal berhasil diresolusi. Jika tidak, maka
-  /// notifikasi akan dijadwalkan berdasarkan waktu UTC.
-  Future<void> _scheduleAllPrayerNotifications() async {
-    debugPrint('[PrayerPage] _scheduleAllPrayerNotifications called.');
-    if (!_isLocalTimeZoneResolved) {
-      debugPrint(
-        '[PrayerPage] WARNING: Local timezone was not resolved. Notifications might be scheduled based on UTC.',
-      );
-    }
-    if (imsak != null) {
-      final imsakTime = _parseTimeString(imsak!, selectedDate);
-      await _schedulePersistentNotification('Imsak', imsakTime);
-    }
-    if (fajr != null) {
-      final fajrTime = _parseTimeString(fajr!, selectedDate);
-      await _schedulePersistentNotification('Shubuh', fajrTime);
-    }
-    if (sunrise != null) {
-      final sunriseTime = _parseTimeString(sunrise!, selectedDate);
-      await _schedulePersistentNotification('Terbit', sunriseTime);
-    }
-
-    if (dhuhr != null) {
-      final dhuhrTime = _parseTimeString(dhuhr!, selectedDate);
-      await _schedulePersistentNotification('Zuhur', dhuhrTime);
-    }
-    if (asr != null) {
-      final asrTime = _parseTimeString(asr!, selectedDate);
-      await _schedulePersistentNotification('Ashar', asrTime);
-    }
-    if (maghrib != null) {
-      final maghribTime = _parseTimeString(maghrib!, selectedDate);
-      await _schedulePersistentNotification('Maghrib', maghribTime);
-    }
-    if (isha != null) {
-      final ishaTime = _parseTimeString(isha!, selectedDate);
-      await _schedulePersistentNotification('Isya', ishaTime);
-    }
-    debugPrint(
-      '[PrayerPage] Finished scheduling all prayer notifications for date: $selectedDate',
-    );
   }
 
   @override
   void initState() {
     super.initState();
+    _notificationService.setNotificationResponseCallback((response) {
+      // No need to navigate if already on PrayerPage
+      debugPrint(
+        '[PrayerPage] Notification tapped while already on PrayerPage',
+      );
+    });
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -251,6 +132,7 @@ class _PrayerPageState extends State<PrayerPage>
       local = tz.UTC;
       _isLocalTimeZoneResolved = false;
     }
+    _notificationService.initialize();
 
     Alarm.init();
     _loadAlarmStates();
@@ -353,7 +235,6 @@ class _PrayerPageState extends State<PrayerPage>
     );
     _scheduleAllPrayerNotifications();
   }
-
 
   void onChangeDate(int days) {
     DateTime newDate = selectedDate.add(Duration(days: days));
@@ -1017,7 +898,7 @@ class _PrayerPageState extends State<PrayerPage>
           body:
               '${context.tr('its_time_for')} $prayerName ${context.tr('prayer_at')} $timeString',
           stopButton: context.tr('stop'),
-          icon: '@mipmap/ic_launcher', 
+          icon: '@mipmap/ic_launcher',
           iconColor: Color(0xff862778),
         ),
       );
@@ -1112,7 +993,6 @@ class _PrayerPageState extends State<PrayerPage>
       );
     }
   }
-
 
   /// Shows an alert dialog to set or cancel an alarm for the given [prayerName] at the given [time].
   ///
