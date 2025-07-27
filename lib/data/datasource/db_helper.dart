@@ -22,12 +22,25 @@ class DbHelper {
 
   Future _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE bookmark(
+      CREATE TABLE IF NOT EXISTS bookmark(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         surat TEXT NOT NULL,
         suratNumber INTEGER NOT NULL,
         ayatNumber INTEGER NOT NULL,
         createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS hadith_bookmark(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        hadith_id INTEGER NOT NULL,
+        book_id INTEGER NOT NULL,
+        chapter_id INTEGER NOT NULL,
+        hadith_text TEXT NOT NULL,
+        narrator TEXT NOT NULL,
+        reference TEXT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     ''');
   }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:masjidku/features/hadit/presentation/hadit_page.dart';
+import 'package:masjidku/presentation/hadit/presentation/hadit_page.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
-import 'features/event/upcoming_event_page.dart';
-import 'features/home/presentation/home_page.dart';
-import 'features/quran/presentation/quran_page.dart';
-import 'features/financial/finance_report_page.dart';
-import 'features/account/presentation/profile_page.dart';
-import 'package:easy_localization/easy_localization.dart'; 
+import 'presentation/home/presentation/home_page.dart';
+import 'presentation/quran/presentation/quran_page.dart';
+import 'presentation/financial/finance_report_page.dart';
+import 'presentation/account/presentation/profile_page.dart';
+import 'l10n/app_localizations.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({super.key});
@@ -24,7 +23,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
     const HomePage(),
     const QuranPage(),
     const FinanceReportPage(),
-    const HadithPage(), 
+    const HadithPage(),
     const ProfilePage(),
   ];
 
@@ -67,7 +66,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final currentLocale = context.locale; // for easy_localization
+    final currentLocale = Localizations.localeOf(context);
 
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
@@ -115,31 +114,31 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           NavigationRailDestination(
                             icon: const Icon(Icons.home_outlined),
                             selectedIcon: const Icon(Icons.home_rounded),
-                            label: Text('home'.tr()),
+                            label: Text(AppLocalizations.of(context)!.home),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.menu_book_outlined),
                             selectedIcon: const Icon(Icons.menu_book_rounded),
-                            label: Text('quran'.tr()),
+                            label: Text(AppLocalizations.of(context)!.quran),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.account_balance_outlined),
                             selectedIcon: const Icon(
                               Icons.account_balance_rounded,
                             ),
-                            label: Text('finance'.tr()),
+                            label: Text(AppLocalizations.of(context)!.finance),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.calendar_today_outlined),
                             selectedIcon: const Icon(
                               Icons.calendar_today_rounded,
                             ),
-                            label: Text('hadith'.tr()),
+                            label: Text(AppLocalizations.of(context)!.hadith),
                           ),
                           NavigationRailDestination(
                             icon: const Icon(Icons.person_outline_rounded),
                             selectedIcon: const Icon(Icons.person_rounded),
-                            label: Text('profile'.tr()),
+                            label: Text(AppLocalizations.of(context)!.profile),
                           ),
                         ],
                       ),
@@ -212,7 +211,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.home_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'home'.tr(),
+                        label: AppLocalizations.of(context)!.home,
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -226,7 +225,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.menu_book_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'quran'.tr(),
+                        label: AppLocalizations.of(context)!.quran,
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -240,7 +239,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.account_balance_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'finance'.tr(),
+                        label: AppLocalizations.of(context)!.finance,
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -255,7 +254,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.calendar_today_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'hadith'.tr(),
+                        label: AppLocalizations.of(context)!.hadith,
                       ),
                       NavigationDestination(
                         icon: Icon(
@@ -269,7 +268,7 @@ class _NavBarState extends State<NavBar> with WidgetsBindingObserver {
                           Icons.person_rounded,
                           color: colorScheme.primary,
                         ),
-                        label: 'profile'.tr(),
+                        label: AppLocalizations.of(context)!.profile,
                       ),
                     ],
                   ),

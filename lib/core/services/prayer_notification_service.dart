@@ -1,12 +1,11 @@
-import 'package:adhan/adhan.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:geolocator/geolocator.dart';
+
+import '../../l10n/app_localizations.dart';
 
 // Move the typedef to the top level (outside the class)
 typedef NotificationResponseCallback =
@@ -254,9 +253,9 @@ class PrayerNotificationService {
             'It\'s time for $prayerName prayer at ${DateFormat.jm().format(prayerTime)}';
 
         if (context != null) {
-          title = '${context.tr('prayer_time_for')} $prayerName';
+          title = '${AppLocalizations.of(context)!.prayer_time_for} $prayerName';
           body =
-              '${context.tr('its_time_for')} $prayerName ${context.tr('prayer_at')} ${DateFormat.jm().format(prayerTime)}';
+              '${AppLocalizations.of(context)!.its_time_for} $prayerName ${AppLocalizations.of(context)!.prayer_at} ${DateFormat.jm().format(prayerTime)}';
         }
 
         await flutterLocalNotificationsPlugin.zonedSchedule(

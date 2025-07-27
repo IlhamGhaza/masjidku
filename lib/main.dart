@@ -1,17 +1,18 @@
 import 'package:alarm/alarm.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/theme/language_cubit.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/utils/permission.dart';
-import 'error_handle_page.dart';
-import 'features/auth/presentation/splash_page.dart';
+import 'presentation/error_handle_page.dart';
+import 'presentation/auth/presentation/splash_page.dart';
 import 'package:quran_flutter/quran_flutter.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +30,6 @@ void main() async {
               ? HydratedStorageDirectory.web
               : HydratedStorageDirectory((await getTemporaryDirectory()).path),
     );
-    await EasyLocalization.ensureInitialized();
     await Quran.initialize();
     await Alarm.init();
     await AlarmPermissions.checkNotificationPermission();
@@ -49,31 +49,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EasyLocalization(
-      supportedLocales: const [Locale('id'), Locale('en')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('id'),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (context) => ThemeCubit()),
-          BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
-        ],
-        child: ErrorHandler(
-          child: BlocBuilder<ThemeCubit, ThemeMode>(
-            builder: (context, themeMode) {
-              return MaterialApp(
-                title: 'MasjidKu',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: themeMode,
-                localizationsDelegates: context.localizationDelegates,
-                supportedLocales: context.supportedLocales,
-                locale: context.locale,
-                home: const SplashPage(),
-              );
-            },
-          ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ThemeCubit()),
+        BlocProvider<LanguageCubit>(create: (context) => LanguageCubit()),
+      ],
+      child: ErrorHandler(
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return BlocBuilder<LanguageCubit, Locale>(
+              builder: (context, locale) {
+                return MaterialApp(
+                  title: 'MasjidKu',
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: themeMode,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [Locale('id'), Locale('en')],
+                  locale: locale,
+                  home: const SplashPage(),
+                );
+              },
+            );
+          },
         ),
       ),
     );
@@ -83,7 +87,7 @@ class MyApp extends StatelessWidget {
 class ErrorHandler extends StatefulWidget {
   final Widget child;
 
-  const ErrorHandler({Key? key, required this.child}) : super(key: key);
+  const ErrorHandler({super.key, required this.child});
 
   @override
   State<ErrorHandler> createState() => _ErrorHandlerState();

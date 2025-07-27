@@ -10,12 +10,9 @@ class AppTheme {
       primary: Color(0xFF3366CC), // Main Blue
       primaryContainer: Color(0xFFE6F0FF), // Primary Light
       onPrimaryContainer: Color(0xFF0D47A1), // Primary Dark
-      secondary: Color(0xFF4285F4), // Secondary Blue
-      // Neutral Colors
-      background: Color(0xFFF5F5F5), // Background
+      secondary: Color(0xFF4285F4), // Background
       surface: Color(0xFFFFFFFF), // Card Background
       onSurface: Color(0xFF212121), // Text Primary
-      onBackground: Color(0xFF212121), // Text Primary
       // Functional Colors
       error: Color(0xFFD32F2F), // Error
       errorContainer: Color(0xFFFFEBEE), // Error Light
@@ -73,13 +70,10 @@ class AppTheme {
       primary: Color(0xFF5B8DEF), // Light Blue
       primaryContainer: Color(0xFF1A3366), // Primary Light
       onPrimaryContainer: Color(0xFF5B8DEF), // Primary Dark
-      secondary: Color(0xFF4285F4), // Secondary Blue
-      // Neutral Colors
-      background: Color(0xFF121212), // Background
+      secondary: Color(0xFF4285F4), // Background
       surface: Color(0xFF1E1E1E), // Card Background
-      surfaceVariant: Color(0xFF282828), // Surface
+      surfaceContainerHighest: Color(0xFF282828), // Surface
       onSurface: Color(0xFFFFFFFF), // Text Primary
-      onBackground: Color(0xFFFFFFFF), // Text Primary
       // Functional Colors
       error: Color(0xFFEF5350), // Error
       errorContainer: Color(0xFFC62828), // Error Dark
